@@ -1,0 +1,6 @@
+# Income and spending. amount is signed USD: income positive, spend negative. id must be stable (a bank's own id, or a hash of the row).
+id,date,amount,kind,name,category
+t-1001,2026-11-01,3000,income,Salary,
+t-1002,2026-11-03,-86.4,expense,Corner Market,Groceries
+t-1003,2026-11-09,-42,expense,Metro pass,Transport
+t-1004,2026-11-12,450,income,Freelance invoice 17,

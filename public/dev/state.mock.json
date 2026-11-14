@@ -1,0 +1,3260 @@
+{
+ "v": 1,
+ "asOf": "2026-09-22T17:25:00Z",
+ "realm": {
+  "place": "Marlow Cove",
+  "country": "ZZ",
+  "biome": "tropical-coast",
+  "lat": -23.1,
+  "lon": -44.6,
+  "tz": "Etc/GMT+3",
+  "localTime": "2026-09-22T14:25:00-03:00",
+  "sun": {
+   "altitude": 47.5,
+   "azimuth": 318,
+   "phase": "day"
+  },
+  "weather": {
+   "tempC": 24,
+   "humidity": 66,
+   "code": 1,
+   "label": "Mainly clear"
+  },
+  "room": {
+   "tempC": 22.4,
+   "humidity": 58,
+   "label": "Study"
+  },
+  "dayOfLife": 13271,
+  "source": "location-feed",
+  "asOf": "2026-09-22T17:18:00Z",
+  "placeRaw": "Old Quay",
+  "city": "Marlow Cove",
+  "kind": "home",
+  "since": "2025-03-17T11:00:00Z",
+  "stale": false,
+  "air": {
+   "usAqi": 31,
+   "pm25": 6.4,
+   "pm10": 11.9,
+   "asOf": "2026-09-22T16:51:00Z",
+   "source": "open-meteo.com"
+  },
+  "lastSeen": "2026-09-22T17:18:00Z",
+  "accuracyM": 35
+ },
+ "characters": [
+  {
+   "id": "gun",
+   "name": "Gun Hudson",
+   "title": "The Legend of Gun",
+   "class": "Operative",
+   "level": 11,
+   "location": "Marlow Cove",
+   "playable": true,
+   "model": "/models/gun.glb",
+   "portrait": "/img/gun.webp",
+   "kind": "person"
+  },
+  {
+   "id": "companion",
+   "kind": "ai",
+   "name": "Juniper",
+   "title": "The helper",
+   "class": "AI familiar",
+   "level": 37,
+   "location": "Kitchen shelf, Marlow Cove",
+   "playable": false,
+   "model": "/models/standin.glb",
+   "status": "2 of 3 hosts healthy · 37 skills · 12 automations"
+  },
+  {
+   "id": "guild",
+   "kind": "guild",
+   "name": "Tidewater Co-op",
+   "title": "The guild",
+   "class": "Co-op",
+   "level": null,
+   "location": "Saturday market",
+   "playable": false,
+   "model": "/models/standin.glb",
+   "status": "6 members · stall day on Saturday",
+   "treasury": 12640
+  }
+ ],
+ "character": {
+  "id": "gun",
+  "name": "Gun Hudson",
+  "title": "The Legend of Gun",
+  "level": 11,
+  "xp": 3460,
+  "xpNext": 5200,
+  "xpToday": 142,
+  "vitals": [
+   {
+    "id": "health",
+    "label": "Health",
+    "value": 77,
+    "cur": 77,
+    "max": 100,
+    "unit": "",
+    "display": "77",
+    "detail": "RHR 54 · weight 78.4 kg",
+    "trend": "flat",
+    "source": "apple-health",
+    "asOf": "2026-09-22T16:33:00Z",
+    "stale": false
+   },
+   {
+    "id": "energy",
+    "label": "Energy",
+    "value": 81,
+    "cur": 7.6,
+    "max": 8,
+    "unit": "h sleep",
+    "display": "81",
+    "detail": "7 h 36 m asleep · woke 07:05",
+    "trend": "up",
+    "source": "apple-health",
+    "asOf": "2026-09-22T10:05:00Z",
+    "stale": false
+   },
+   {
+    "id": "stamina",
+    "label": "Stamina",
+    "value": 54,
+    "cur": 6420,
+    "max": 12000,
+    "unit": "steps",
+    "display": "6,420",
+    "detail": "6,420 of 12,000 steps",
+    "trend": "flat",
+    "source": "apple-watch",
+    "asOf": "2026-09-22T17:21:00Z",
+    "stale": false
+   },
+   {
+    "id": "fuel",
+    "label": "Fuel",
+    "value": 63,
+    "cur": 88,
+    "max": 140,
+    "unit": "g protein",
+    "display": "88 g",
+    "detail": "88 of 140 g protein · 1,690 kcal",
+    "trend": "up",
+    "source": "meal-log",
+    "asOf": "2026-09-22T15:49:00Z",
+    "stale": false
+   },
+   {
+    "id": "focus",
+    "label": "Focus",
+    "value": 31,
+    "cur": 1.25,
+    "max": 4,
+    "unit": "h deep work",
+    "display": "1 h 15 m",
+    "detail": "One block after lunch",
+    "trend": "down",
+    "source": "screen-time",
+    "asOf": "2026-09-22T17:04:00Z",
+    "stale": false
+   },
+   {
+    "id": "gold",
+    "label": "Gold",
+    "value": 58,
+    "cur": 212,
+    "max": 365,
+    "unit": "days runway",
+    "display": "212 d",
+    "detail": "212 days of runway at $185 a day",
+    "trend": "up",
+    "source": "bank-feed",
+    "asOf": "2026-09-22T16:12:00Z",
+    "stale": false
+   }
+  ],
+  "meters": [
+   {
+    "id": "money",
+    "label": "Money",
+    "value": 46,
+    "display": "46%",
+    "detail": "Cashflow: $4,770 in against $5,550 out, last 30 days",
+    "trend": "flat",
+    "source": "bank-feed",
+    "asOf": "2026-09-22T16:12:00Z",
+    "stale": false
+   },
+   {
+    "id": "energy",
+    "label": "Energy",
+    "value": 81,
+    "display": "81%",
+    "detail": "From a full night and a low resting heart rate",
+    "trend": "up",
+    "source": "apple-health",
+    "asOf": "2026-09-22T10:05:00Z",
+    "stale": false
+   },
+   {
+    "id": "sleep",
+    "label": "Sleep",
+    "value": 95,
+    "display": "95%",
+    "detail": "7 h 36 m of an 8 h target",
+    "trend": "up",
+    "source": "apple-health",
+    "asOf": "2026-09-22T10:05:00Z",
+    "stale": false
+   },
+   {
+    "id": "social",
+    "label": "Social",
+    "value": 44,
+    "display": "44%",
+    "detail": "4 conversations in the last 7 days",
+    "trend": "down",
+    "source": "chat-sync",
+    "asOf": "2026-09-22T14:15:00Z",
+    "stale": false
+   },
+   {
+    "id": "care",
+    "label": "Personal care",
+    "value": 60,
+    "display": "60%",
+    "detail": "Haircut 3 weeks ago · dentist booked",
+    "trend": "flat",
+    "source": "tasks",
+    "asOf": "2026-09-21T16:25:00Z",
+    "stale": true
+   },
+   {
+    "id": "happiness",
+    "label": "Happiness",
+    "value": null,
+    "display": null,
+    "detail": "Nothing measures this yet",
+    "source": null,
+    "asOf": null,
+    "stale": true
+   },
+   {
+    "id": "self",
+    "label": "Self-connection",
+    "value": null,
+    "display": null,
+    "detail": "Nothing measures this yet",
+    "source": null,
+    "asOf": null,
+    "stale": true
+   },
+   {
+    "id": "giving",
+    "label": "Giving / support",
+    "value": 67,
+    "display": "67%",
+    "detail": "Helped at the co-op stall twice this month",
+    "trend": "up",
+    "source": "tasks",
+    "asOf": "2026-09-20T20:25:00Z",
+    "stale": false
+   },
+   {
+    "id": "learning",
+    "label": "Learning / expansion",
+    "value": 29,
+    "display": "29%",
+    "detail": "One chapter and half a language lesson",
+    "trend": "down",
+    "source": "e-reader",
+    "asOf": "2026-09-21T22:35:00Z",
+    "stale": false
+   }
+  ],
+  "attributes": [
+   {
+    "id": "strategy",
+    "label": "Strategy",
+    "level": 7,
+    "xp": 455,
+    "xpNext": 900,
+    "xp7d": 35,
+    "top": [
+     "Month plan written"
+    ],
+    "source": "xp ledger",
+    "asOf": "2026-09-20T12:15:00Z"
+   },
+   {
+    "id": "body",
+    "label": "Body",
+    "level": 9,
+    "xp": 1010,
+    "xpNext": 1400,
+    "xp7d": 205,
+    "top": [
+     "Long walk, 14 km",
+     "Slept 7 h 36 m"
+    ],
+    "source": "xp ledger",
+    "asOf": "2026-09-22T10:05:00Z"
+   },
+   {
+    "id": "mind",
+    "label": "Mind",
+    "level": 8,
+    "xp": 275,
+    "xpNext": 1100,
+    "xp7d": 110,
+    "top": [
+     "1 h 15 m deep work",
+     "Crossword finished"
+    ],
+    "source": "xp ledger",
+    "asOf": "2026-09-22T17:04:00Z"
+   },
+   {
+    "id": "things",
+    "label": "Things",
+    "level": 6,
+    "xp": 720,
+    "xpNext": 750,
+    "xp7d": 85,
+    "top": [
+     "Bike tyre replaced"
+    ],
+    "source": "xp ledger",
+    "asOf": "2026-09-19T04:55:00Z"
+   },
+   {
+    "id": "people",
+    "label": "People",
+    "level": 5,
+    "xp": 95,
+    "xpNext": 650,
+    "xp7d": 25,
+    "top": [
+     "Chess with Desmond"
+    ],
+    "source": "xp ledger",
+    "asOf": "2026-09-21T14:25:00Z"
+   },
+   {
+    "id": "joy",
+    "label": "Joy",
+    "level": 6,
+    "xp": 505,
+    "xpNext": 700,
+    "xp7d": 140,
+    "top": [
+     "Evening swim",
+     "Baked bread"
+    ],
+    "source": "xp ledger",
+    "asOf": "2026-09-21T21:10:00Z"
+   },
+   {
+    "id": "wealth",
+    "label": "Wealth",
+    "level": 8,
+    "xp": 830,
+    "xpNext": 1200,
+    "xp7d": 65,
+    "top": [
+     "Salary landed",
+     "Bills listed"
+    ],
+    "source": "xp ledger",
+    "asOf": "2026-09-22T16:12:00Z"
+   },
+   {
+    "id": "connection",
+    "label": "Connection",
+    "level": 4,
+    "xp": 225,
+    "xpNext": 500,
+    "xp7d": 15,
+    "top": [
+     "Postcard to Aunt Philippa"
+    ],
+    "source": "xp ledger",
+    "asOf": "2026-09-17T15:45:00Z"
+   },
+   {
+    "id": "growth",
+    "label": "Growth",
+    "level": 7,
+    "xp": 640,
+    "xpNext": 950,
+    "xp7d": 55,
+    "top": [
+     "Language lesson 12"
+    ],
+    "source": "xp ledger",
+    "asOf": "2026-09-21T22:35:00Z"
+   },
+   {
+    "id": "impact",
+    "label": "Impact",
+    "level": 3,
+    "xp": 180,
+    "xpNext": 350,
+    "xp7d": 70,
+    "top": [
+     "Co-op stall shift"
+    ],
+    "source": "xp ledger",
+    "asOf": "2026-09-20T20:25:00Z"
+   }
+  ],
+  "buffs": [
+   {
+    "id": "well-rested",
+    "kind": "buff",
+    "label": "Well rested",
+    "detail": "7 h 36 m, over the 7 h 30 m line",
+    "icon": "moon",
+    "since": "2026-09-22T10:05:00Z",
+    "until": "2026-09-22T21:00:00Z",
+    "source": "apple-health"
+   },
+   {
+    "id": "fresh-air",
+    "kind": "buff",
+    "label": "Fresh air",
+    "detail": "38 min outside at lunch",
+    "icon": "sun",
+    "since": "2026-09-22T15:27:00Z",
+    "until": "2026-09-22T19:27:00Z",
+    "source": "apple-watch"
+   },
+   {
+    "id": "streak-diary",
+    "kind": "buff",
+    "label": "Diary streak ×23",
+    "detail": "Twenty-three days of logged meals",
+    "icon": "flame",
+    "since": "2026-08-30T12:15:00Z",
+    "until": null,
+    "source": "meal-log"
+   },
+   {
+    "id": "tea",
+    "kind": "buff",
+    "label": "Tea break",
+    "detail": "Pot of green tea at 13:40",
+    "icon": "coffee",
+    "since": "2026-09-22T16:40:00Z",
+    "until": "2026-09-22T18:40:00Z",
+    "source": "manual:web"
+   },
+   {
+    "id": "desk-bound",
+    "kind": "debuff",
+    "label": "Desk-bound",
+    "detail": "Under 700 steps between 09:00 and 12:00",
+    "icon": "hourglass",
+    "since": "2026-09-22T12:00:00Z",
+    "until": "2026-09-22T20:00:00Z",
+    "source": "apple-watch"
+   }
+  ],
+  "equipment": [
+   {
+    "slot": "head",
+    "item": {
+     "id": "itm-h1",
+     "name": "Canvas bucket hat",
+     "img": null,
+     "cat": "hat",
+     "rarity": "common",
+     "valueUsd": 24,
+     "detail": "Faded green.",
+     "source": "inventory",
+     "equipped": true,
+     "assumed": false,
+     "slot": "head",
+     "equipSource": "manual:web",
+     "equipAsOf": "2026-09-20T15:50:00Z"
+    }
+   },
+   {
+    "slot": "chest",
+    "item": {
+     "id": "itm-c1",
+     "name": "Grey rugby shirt",
+     "img": null,
+     "cat": "clothes",
+     "rarity": "uncommon",
+     "valueUsd": 48,
+     "detail": "Size L. The weekend default.",
+     "source": "inventory",
+     "equipped": true,
+     "assumed": false,
+     "slot": "chest",
+     "equipSource": "manual:web",
+     "equipAsOf": "2026-09-21T15:50:00Z"
+    }
+   },
+   {
+    "slot": "legs",
+    "item": {
+     "id": "itm-l1",
+     "name": "Olive work trousers",
+     "img": null,
+     "cat": "pants",
+     "rarity": "common",
+     "valueUsd": 52,
+     "detail": "Double knee.",
+     "source": "inventory",
+     "equipped": true,
+     "assumed": false,
+     "slot": "legs",
+     "equipSource": "manual:web",
+     "equipAsOf": "2026-09-21T15:50:00Z"
+    }
+   },
+   {
+    "slot": "feet",
+    "item": {
+     "id": "itm-f1",
+     "name": "Brown desert boots",
+     "img": null,
+     "cat": "shoes",
+     "rarity": "uncommon",
+     "valueUsd": 115,
+     "detail": "Resoled once.",
+     "source": "inventory",
+     "equipped": true,
+     "assumed": true,
+     "slot": "feet",
+     "equipSource": "inventory",
+     "equipAsOf": "2026-09-13T15:50:00Z"
+    }
+   },
+   {
+    "slot": "back",
+    "item": {
+     "id": "bag-messenger",
+     "name": "Canvas messenger bag",
+     "img": null,
+     "cat": "bag",
+     "rarity": "uncommon",
+     "valueUsd": 130,
+     "detail": "14 L. Opens as its own bag.",
+     "source": "inventory",
+     "equipped": true,
+     "assumed": false,
+     "slot": "back",
+     "equipSource": "manual:web",
+     "equipAsOf": "2026-09-06T15:50:00Z"
+    }
+   },
+   {
+    "slot": "wrist",
+    "item": {
+     "id": "itm-w1",
+     "name": "Fitness band",
+     "img": null,
+     "cat": "watch",
+     "rarity": "uncommon",
+     "valueUsd": 90,
+     "detail": "Steps, sleep, pulse.",
+     "source": "inventory",
+     "equipped": true,
+     "assumed": false,
+     "slot": "wrist",
+     "equipSource": "manual:web",
+     "equipAsOf": "2026-07-23T15:50:00Z"
+    }
+   },
+   {
+    "slot": "finger",
+    "item": {
+     "id": "itm-r1",
+     "name": "Signet ring",
+     "img": null,
+     "cat": "ring",
+     "rarity": "rare",
+     "valueUsd": 70,
+     "detail": "A hand-me-down.",
+     "source": "inventory",
+     "equipped": true,
+     "assumed": true,
+     "slot": "finger",
+     "equipSource": "inventory",
+     "equipAsOf": "2026-02-22T15:50:00Z"
+    }
+   },
+   {
+    "slot": "mainhand",
+    "item": {
+     "id": "itm-m1",
+     "name": "Laptop, 14 in",
+     "img": null,
+     "cat": "computer",
+     "rarity": "epic",
+     "valueUsd": 1350,
+     "detail": "16 GB, silver.",
+     "source": "inventory",
+     "equipped": true,
+     "assumed": false,
+     "slot": "mainhand",
+     "equipSource": "manual:web",
+     "equipAsOf": "2026-09-17T15:50:00Z"
+    }
+   },
+   {
+    "slot": "offhand",
+    "item": {
+     "id": "itm-o1",
+     "name": "Phone",
+     "img": null,
+     "cat": "phone",
+     "rarity": "rare",
+     "valueUsd": 640,
+     "detail": "Maps, tickets, torch.",
+     "source": "inventory",
+     "equipped": true,
+     "assumed": false,
+     "slot": "offhand",
+     "equipSource": "manual:web",
+     "equipAsOf": "2026-09-17T15:50:00Z"
+    }
+   },
+   {
+    "slot": "vehicle",
+    "item": {
+     "quest": "Build the Rainy-Day Fund",
+     "detail": "Opens once the main quest is done."
+    }
+   },
+   {
+    "slot": "trinket1",
+    "item": {
+     "id": "itm-t1",
+     "name": "Pocket notebook",
+     "img": null,
+     "cat": "document",
+     "rarity": "common",
+     "valueUsd": 6,
+     "detail": "Lists and sketches.",
+     "source": "inventory",
+     "equipped": true,
+     "assumed": true,
+     "slot": "trinket1",
+     "equipSource": "inventory",
+     "equipAsOf": "2026-08-20T15:50:00Z"
+    }
+   }
+  ],
+  "body": {
+   "weightKg": 78.4,
+   "bodyFatPct": 13.6,
+   "rhr": 54,
+   "source": "smart-scale",
+   "asOf": "2026-09-22T09:33:00Z",
+   "history": [
+    {
+     "d": "2026-09-09",
+     "w": 77.6,
+     "bf": 14.1
+    },
+    {
+     "d": "2026-09-10",
+     "w": 77.9
+    },
+    {
+     "d": "2026-09-11",
+     "w": 77.7
+    },
+    {
+     "d": "2026-09-12",
+     "w": 78.1,
+     "bf": 14.0
+    },
+    {
+     "d": "2026-09-13",
+     "w": 78.3
+    },
+    {
+     "d": "2026-09-14",
+     "w": 78.0
+    },
+    {
+     "d": "2026-09-15",
+     "w": 77.8,
+     "bf": 13.9
+    },
+    {
+     "d": "2026-09-16",
+     "w": 78.2
+    },
+    {
+     "d": "2026-09-17",
+     "w": 78.5
+    },
+    {
+     "d": "2026-09-18",
+     "w": 78.3,
+     "bf": 13.8
+    },
+    {
+     "d": "2026-09-19",
+     "w": 78.6
+    },
+    {
+     "d": "2026-09-20",
+     "w": 78.2
+    },
+    {
+     "d": "2026-09-21",
+     "w": 78.5,
+     "bf": 13.7
+    },
+    {
+     "d": "2026-09-22",
+     "w": 78.4,
+     "bf": 13.6
+    }
+   ],
+   "leanMassKg": 67.7,
+   "bmi": 22.7,
+   "hrv": 68,
+   "weighedOn": "2026-09-22",
+   "prov": {
+    "weightKg": {
+     "source": "smart-scale",
+     "asOf": "2026-09-22T09:33:00Z"
+    },
+    "bodyFatPct": {
+     "source": "smart-scale",
+     "asOf": "2026-09-22T09:33:00Z"
+    },
+    "leanMassKg": {
+     "source": "smart-scale",
+     "asOf": "2026-09-22T09:33:00Z"
+    },
+    "bmi": {
+     "source": "smart-scale",
+     "asOf": "2026-09-22T09:33:00Z"
+    },
+    "rhr": {
+     "source": "apple-health",
+     "asOf": "2026-09-22T16:33:00Z"
+    },
+    "hrv": {
+     "source": "apple-health",
+     "asOf": "2026-09-22T16:33:00Z"
+    }
+   },
+   "goal": {
+    "weightKg": 80,
+    "bodyFatPct": 13,
+    "leanMassKg": 69.6,
+    "source": "goals",
+    "asOf": "2026-08-06T14:05:00Z"
+   }
+  },
+  "class": "Operative",
+  "readiness": {
+   "score": 83,
+   "multiplier": 1.11,
+   "parts": {
+    "sleep": 88,
+    "rhr": 79,
+    "hrv": 81
+   }
+  },
+  "activity": {
+   "name": "walking",
+   "since": "2026-09-22T17:02:00Z",
+   "until": "2026-09-22T17:47:00Z",
+   "basis": "Steady steps along the quay since 14:02.",
+   "source": "apple-watch",
+   "asOf": "2026-09-22T17:21:00Z",
+   "inferred": false
+  }
+ },
+ "quests": {
+  "main": {
+   "id": "main-fund",
+   "title": "Build the Rainy-Day Fund",
+   "text": "Put a year of living costs aside. A full fund opens the growth tiers.",
+   "giver": "Gun",
+   "area": "wealth",
+   "progress": {
+    "cur": 7,
+    "max": 12,
+    "unit": "months saved",
+    "pct": 58
+   },
+   "steps": [
+    {
+     "title": "Write down every bill",
+     "done": true
+    },
+    {
+     "title": "Open a separate savings account",
+     "done": true
+    },
+    {
+     "title": "Half a year saved",
+     "done": true
+    },
+    {
+     "title": "Nine months saved",
+     "done": false
+    },
+    {
+     "title": "Sell what is not used",
+     "done": false
+    },
+    {
+     "title": "A full year saved",
+     "done": false
+    }
+   ],
+   "state": "active",
+   "xp": 4000,
+   "source": "bank-feed",
+   "category": "Wealth",
+   "tier": 2,
+   "oneThing": {
+    "title": "A full year saved",
+    "period": "2026-H2",
+    "due": "2026-12-18",
+    "next": {
+     "date": "2026-10-09",
+     "label": "Eight months saved"
+    }
+   }
+  },
+  "daily": [
+   {
+    "id": "d-steps",
+    "title": "Walk 12,000 steps",
+    "text": "Counted by the band.",
+    "giver": "Engine",
+    "area": "body",
+    "progress": {
+     "cur": 6420,
+     "max": 12000,
+     "unit": "steps",
+     "pct": 54
+    },
+    "steps": [],
+    "state": "active",
+    "xp": 30,
+    "source": "apple-watch",
+    "category": "Health",
+    "tier": 1
+   },
+   {
+    "id": "d-meals",
+    "title": "Log three meals",
+    "text": "Anything written in the food diary counts.",
+    "giver": "Engine",
+    "area": "body",
+    "progress": {
+     "cur": 2,
+     "max": 3,
+     "unit": "meals",
+     "pct": 67
+    },
+    "steps": [],
+    "state": "active",
+    "xp": 12,
+    "source": "meal-log",
+    "category": "Health",
+    "tier": 1
+   },
+   {
+    "id": "d-protein",
+    "title": "Eat 140 g of protein",
+    "text": "Added up from the food diary.",
+    "giver": "Engine",
+    "area": "body",
+    "progress": {
+     "cur": 88,
+     "max": 140,
+     "unit": "g",
+     "pct": 63
+    },
+    "steps": [],
+    "state": "active",
+    "xp": 18,
+    "source": "meal-log",
+    "category": "Health",
+    "tier": 1
+   },
+   {
+    "id": "d-sleep",
+    "title": "Sleep seven and a half hours",
+    "text": "The night just gone.",
+    "giver": "Engine",
+    "area": "body",
+    "progress": {
+     "cur": 7.6,
+     "max": 7.5,
+     "unit": "h",
+     "pct": 100
+    },
+    "steps": [],
+    "state": "done",
+    "xp": 24,
+    "source": "apple-health",
+    "category": "Health",
+    "tier": 1
+   },
+   {
+    "id": "d-focus",
+    "title": "One focus block",
+    "text": "Fifty minutes, phone in another room.",
+    "giver": "Engine",
+    "area": "mind",
+    "progress": {
+     "cur": 1,
+     "max": 1,
+     "unit": "block",
+     "pct": 100
+    },
+    "steps": [],
+    "state": "done",
+    "xp": 28,
+    "source": "screen-time",
+    "category": "Health",
+    "tier": 1
+   }
+  ],
+  "weekly": [
+   {
+    "id": "w-cook",
+    "title": "Cook at home five nights",
+    "text": "Dinner from the food diary.",
+    "giver": "Engine",
+    "area": "body",
+    "progress": {
+     "cur": 3,
+     "max": 5,
+     "unit": "nights",
+     "pct": 60
+    },
+    "steps": [],
+    "state": "active",
+    "xp": 70,
+    "source": "meal-log",
+    "category": "Health",
+    "tier": 1
+   },
+   {
+    "id": "w-walks",
+    "title": "Two long walks",
+    "text": "Ten kilometres or more each.",
+    "giver": "Engine",
+    "area": "joy",
+    "progress": {
+     "cur": 1,
+     "max": 2,
+     "unit": "walks",
+     "pct": 50
+    },
+    "steps": [],
+    "state": "active",
+    "xp": 55,
+    "source": "apple-watch",
+    "category": "Hobbies",
+    "tier": 1
+   },
+   {
+    "id": "w-budget",
+    "title": "Budget check-in",
+    "text": "Read the month so far and move the spare to savings.",
+    "giver": "Engine",
+    "area": "wealth",
+    "progress": {
+     "cur": 1,
+     "max": 1,
+     "unit": "",
+     "pct": 100
+    },
+    "steps": [],
+    "state": "done",
+    "xp": 45,
+    "source": "tasks",
+    "category": "Wealth",
+    "tier": 1
+   },
+   {
+    "id": "w-relative",
+    "title": "Ring a relative",
+    "text": "Any call longer than five minutes.",
+    "giver": "Engine",
+    "area": "connection",
+    "progress": {
+     "cur": 0,
+     "max": 1,
+     "unit": "",
+     "pct": 0
+    },
+    "steps": [],
+    "state": "active",
+    "xp": 35,
+    "source": "chat-sync",
+    "category": "Relationships",
+    "tier": 1
+   }
+  ],
+  "side": [
+   {
+    "id": "rebuild:0",
+    "kind": "rebuild",
+    "title": "Find a grocer",
+    "text": "Find a grocer in Marlow Cove. Settle it by voice.",
+    "giver": "Marlow Cove",
+    "area": "body",
+    "category": "Health",
+    "tier": 1,
+    "order": 1,
+    "progress": {
+     "cur": 1,
+     "max": 1,
+     "unit": "",
+     "pct": 100
+    },
+    "state": "done",
+    "xp": 25,
+    "source": "engine",
+    "next": false
+   },
+   {
+    "id": "rebuild:1",
+    "kind": "rebuild",
+    "title": "Join the library",
+    "text": "Join the library in Marlow Cove. Settle it by voice.",
+    "giver": "Marlow Cove",
+    "area": "body",
+    "category": "Health",
+    "tier": 1,
+    "order": 2,
+    "progress": {
+     "cur": 1,
+     "max": 1,
+     "unit": "",
+     "pct": 100
+    },
+    "state": "done",
+    "xp": 25,
+    "source": "engine",
+    "next": false
+   },
+   {
+    "id": "rebuild:2",
+    "kind": "rebuild",
+    "title": "Set up the study desk",
+    "text": "Set up the study desk in Marlow Cove. Settle it by voice.",
+    "giver": "Marlow Cove",
+    "area": "body",
+    "category": "Health",
+    "tier": 2,
+    "order": 3,
+    "progress": {
+     "cur": 0,
+     "max": 1,
+     "unit": "",
+     "pct": 0
+    },
+    "state": "active",
+    "xp": 25,
+    "source": "engine",
+    "next": true
+   },
+   {
+    "id": "k-1",
+    "title": "Move the spare into savings",
+    "text": "Whatever is left after bills this month.",
+    "giver": "Task list",
+    "area": "wealth",
+    "progress": {
+     "cur": 0,
+     "max": 1,
+     "unit": "",
+     "pct": 0
+    },
+    "steps": [],
+    "state": "active",
+    "xp": 35,
+    "source": "tasks",
+    "kind": "task",
+    "category": "Wealth",
+    "doDate": "2026-09-22",
+    "dueDate": null,
+    "oneThing": true,
+    "url": "https://example.org/tasks",
+    "priority": "⭐ One Thing",
+    "world": "gun"
+   },
+   {
+    "id": "k-2",
+    "title": "Repaint the bike shed door",
+    "text": "Sanded; primer next.",
+    "giver": "Task list",
+    "area": "things",
+    "progress": {
+     "cur": 1,
+     "max": 3,
+     "unit": "coats",
+     "pct": 33
+    },
+    "steps": [],
+    "state": "active",
+    "xp": 55,
+    "source": "tasks",
+    "kind": "task",
+    "category": "Hobbies",
+    "doDate": "2026-09-26",
+    "dueDate": "2026-10-03",
+    "oneThing": false,
+    "url": "https://example.org/tasks",
+    "priority": "Low",
+    "world": "gun"
+   },
+   {
+    "id": "k-3",
+    "title": "Label the co-op price cards",
+    "text": "For Saturday's stall.",
+    "giver": "Task list",
+    "area": "impact",
+    "progress": {
+     "cur": 14,
+     "max": 40,
+     "unit": "cards",
+     "pct": 35
+    },
+    "steps": [],
+    "state": "active",
+    "xp": 25,
+    "source": "tasks",
+    "kind": "task",
+    "category": "Relationships",
+    "doDate": "2026-09-24",
+    "dueDate": "2026-09-26",
+    "oneThing": false,
+    "url": "https://example.org/tasks",
+    "priority": "High",
+    "world": "guild"
+   },
+   {
+    "id": "k-4",
+    "title": "Return the library books",
+    "text": "",
+    "giver": "Task list",
+    "area": "growth",
+    "progress": {
+     "cur": 0,
+     "max": 1,
+     "unit": "",
+     "pct": 0
+    },
+    "steps": [],
+    "state": "active",
+    "xp": 10,
+    "source": "tasks",
+    "kind": "task",
+    "category": "Learning/Skills",
+    "doDate": "2026-09-23",
+    "dueDate": "2026-09-28",
+    "oneThing": false,
+    "url": "https://example.org/tasks",
+    "priority": "Medium",
+    "world": "gun"
+   },
+   {
+    "id": "k-5",
+    "title": "Fix the dripping tap",
+    "text": "Washer bought.",
+    "giver": "Task list",
+    "area": "things",
+    "progress": {
+     "cur": 1,
+     "max": 2,
+     "unit": "steps",
+     "pct": 50
+    },
+    "steps": [],
+    "state": "active",
+    "xp": 32,
+    "source": "tasks",
+    "kind": "task",
+    "category": "Hobbies",
+    "doDate": null,
+    "dueDate": null,
+    "oneThing": false,
+    "url": "https://example.org/tasks",
+    "priority": "Medium",
+    "world": "gun"
+   },
+   {
+    "id": "k-6",
+    "title": "Write to Aunt Philippa",
+    "text": "",
+    "giver": "Task list",
+    "area": "connection",
+    "progress": {
+     "cur": 0,
+     "max": 1,
+     "unit": "",
+     "pct": 0
+    },
+    "steps": [],
+    "state": "active",
+    "xp": 18,
+    "source": "tasks",
+    "kind": "task",
+    "category": "Relationships",
+    "doDate": "2026-09-25",
+    "dueDate": null,
+    "oneThing": false,
+    "url": "https://example.org/tasks",
+    "priority": null,
+    "world": "gun"
+   },
+   {
+    "id": "k-7",
+    "title": "Renew the bus pass",
+    "text": "",
+    "giver": "Task list",
+    "area": "wealth",
+    "progress": {
+     "cur": 0,
+     "max": 1,
+     "unit": "",
+     "pct": 0
+    },
+    "steps": [],
+    "state": "active",
+    "xp": 15,
+    "source": "tasks",
+    "kind": "task",
+    "category": "Wealth",
+    "doDate": null,
+    "dueDate": "2026-09-30",
+    "oneThing": false,
+    "url": "https://example.org/tasks",
+    "priority": "High",
+    "world": "gun"
+   },
+   {
+    "id": "k-8",
+    "title": "Practise the language course, unit 13",
+    "text": "",
+    "giver": "Task list",
+    "area": "growth",
+    "progress": {
+     "cur": 0,
+     "max": 1,
+     "unit": "",
+     "pct": 0
+    },
+    "steps": [],
+    "state": "active",
+    "xp": 38,
+    "source": "tasks",
+    "kind": "task",
+    "category": "Learning/Skills",
+    "doDate": "2026-09-23",
+    "dueDate": null,
+    "oneThing": false,
+    "url": "https://example.org/tasks",
+    "priority": null,
+    "world": "gun"
+   },
+   {
+    "id": "k-9",
+    "title": "Plan the hill walk with Marisol",
+    "text": "",
+    "giver": "Task list",
+    "area": "joy",
+    "progress": {
+     "cur": 0,
+     "max": 1,
+     "unit": "",
+     "pct": 0
+    },
+    "steps": [],
+    "state": "active",
+    "xp": 28,
+    "source": "tasks",
+    "kind": "task",
+    "category": "Hobbies",
+    "doDate": "2026-09-27",
+    "dueDate": null,
+    "oneThing": false,
+    "url": "https://example.org/tasks",
+    "priority": "Low",
+    "world": "gun"
+   },
+   {
+    "id": "k-10",
+    "title": "Count the stall float",
+    "text": "Coins bagged and written down.",
+    "giver": "Task list",
+    "area": "wealth",
+    "progress": {
+     "cur": 1,
+     "max": 1,
+     "unit": "",
+     "pct": 100
+    },
+    "steps": [],
+    "state": "done",
+    "xp": 22,
+    "source": "tasks",
+    "kind": "task",
+    "category": "Wealth",
+    "doDate": null,
+    "dueDate": null,
+    "oneThing": false,
+    "url": "https://example.org/tasks",
+    "priority": null,
+    "world": "guild"
+   },
+   {
+    "id": "k-11",
+    "title": "Book an eye test",
+    "text": "",
+    "giver": "Task list",
+    "area": "body",
+    "progress": {
+     "cur": 0,
+     "max": 1,
+     "unit": "",
+     "pct": 0
+    },
+    "steps": [],
+    "state": "active",
+    "xp": 15,
+    "source": "tasks",
+    "kind": "task",
+    "category": "Health",
+    "doDate": null,
+    "dueDate": "2026-10-11",
+    "oneThing": false,
+    "url": "https://example.org/tasks",
+    "priority": null,
+    "world": "gun"
+   },
+   {
+    "id": "k-12",
+    "title": "Defrost the freezer",
+    "text": "",
+    "giver": "Task list",
+    "area": "things",
+    "progress": {
+     "cur": 0,
+     "max": 1,
+     "unit": "",
+     "pct": 0
+    },
+    "steps": [],
+    "state": "active",
+    "xp": 20,
+    "source": "tasks",
+    "kind": "task",
+    "category": "Health",
+    "doDate": null,
+    "dueDate": null,
+    "oneThing": false,
+    "url": "https://example.org/tasks",
+    "priority": "Low",
+    "world": "gun"
+   },
+   {
+    "id": "k-13",
+    "title": "Photograph the bookshelf for the catalogue",
+    "text": "",
+    "giver": "Task list",
+    "area": "things",
+    "progress": {
+     "cur": 22,
+     "max": 60,
+     "unit": "books",
+     "pct": 37
+    },
+    "steps": [],
+    "state": "active",
+    "xp": 45,
+    "source": "inventory",
+    "kind": "task",
+    "category": "Hobbies",
+    "doDate": "2026-09-28",
+    "dueDate": null,
+    "oneThing": false,
+    "url": "https://example.org/tasks",
+    "priority": null,
+    "world": "gun"
+   },
+   {
+    "id": "k-14",
+    "title": "Read two chapters of the garden book",
+    "text": "",
+    "giver": "Task list",
+    "area": "mind",
+    "progress": {
+     "cur": 1,
+     "max": 2,
+     "unit": "chapters",
+     "pct": 50
+    },
+    "steps": [],
+    "state": "active",
+    "xp": 25,
+    "source": "tasks",
+    "kind": "task",
+    "category": "Spiritual",
+    "doDate": "2026-09-24",
+    "dueDate": null,
+    "oneThing": false,
+    "url": "https://example.org/tasks",
+    "priority": null,
+    "world": "gun"
+   },
+   {
+    "id": "k-15",
+    "title": "Order seeds for the window boxes",
+    "text": "",
+    "giver": "Task list",
+    "area": "joy",
+    "progress": {
+     "cur": 0,
+     "max": 1,
+     "unit": "",
+     "pct": 0
+    },
+    "steps": [],
+    "state": "active",
+    "xp": 10,
+    "source": "tasks",
+    "kind": "task",
+    "category": "Hobbies",
+    "doDate": null,
+    "dueDate": "2026-10-05",
+    "oneThing": false,
+    "url": "https://example.org/tasks",
+    "priority": "Medium",
+    "world": "gun"
+   },
+   {
+    "id": "k-16",
+    "title": "Draft the co-op rota for October",
+    "text": "",
+    "giver": "Task list",
+    "area": "impact",
+    "progress": {
+     "cur": 0,
+     "max": 1,
+     "unit": "",
+     "pct": 0
+    },
+    "steps": [],
+    "state": "active",
+    "xp": 50,
+    "source": "tasks",
+    "kind": "task",
+    "category": "Relationships",
+    "doDate": "2026-09-29",
+    "dueDate": "2026-10-01",
+    "oneThing": false,
+    "url": "https://example.org/tasks",
+    "priority": "Medium",
+    "world": "guild"
+   },
+   {
+    "id": "k-17",
+    "title": "Mend the coat pocket",
+    "text": "",
+    "giver": "Task list",
+    "area": "things",
+    "progress": {
+     "cur": 1,
+     "max": 1,
+     "unit": "",
+     "pct": 100
+    },
+    "steps": [],
+    "state": "done",
+    "xp": 10,
+    "source": "tasks",
+    "kind": "task",
+    "category": "Hobbies",
+    "doDate": null,
+    "dueDate": null,
+    "oneThing": false,
+    "url": "https://example.org/tasks",
+    "priority": null,
+    "world": "gun"
+   }
+  ],
+  "openTasks": 15,
+  "sideTotal": 20,
+  "sideShown": 20,
+  "openTasksShown": 15,
+  "sideCut": false
+ },
+ "inventory": {
+  "count": 52,
+  "value": 5064,
+  "source": "inventory",
+  "asOf": "2026-09-21T15:30:00Z",
+  "bags": [
+   {
+    "id": "bag-person",
+    "name": "On person",
+    "location": "Marlow Cove",
+    "kind": "location",
+    "itemId": null,
+    "items": [
+     {
+      "id": "itm-h1",
+      "name": "Canvas bucket hat",
+      "img": null,
+      "cat": "hat",
+      "slot": "head",
+      "rarity": "common",
+      "qty": 1,
+      "valueUsd": 24,
+      "detail": "Faded green.",
+      "source": "inventory",
+      "equipped": true,
+      "assumed": false
+     },
+     {
+      "id": "itm-c1",
+      "name": "Grey rugby shirt",
+      "img": null,
+      "cat": "clothes",
+      "slot": "chest",
+      "rarity": "uncommon",
+      "qty": 1,
+      "valueUsd": 48,
+      "detail": "Size L. The weekend default.",
+      "source": "inventory",
+      "equipped": true,
+      "assumed": false
+     },
+     {
+      "id": "itm-l1",
+      "name": "Olive work trousers",
+      "img": null,
+      "cat": "pants",
+      "slot": "legs",
+      "rarity": "common",
+      "qty": 1,
+      "valueUsd": 52,
+      "detail": "Double knee.",
+      "source": "inventory",
+      "equipped": true,
+      "assumed": false
+     },
+     {
+      "id": "itm-f1",
+      "name": "Brown desert boots",
+      "img": null,
+      "cat": "shoes",
+      "slot": "feet",
+      "rarity": "uncommon",
+      "qty": 1,
+      "valueUsd": 115,
+      "detail": "Resoled once.",
+      "source": "inventory",
+      "equipped": true,
+      "assumed": true
+     },
+     {
+      "id": "itm-w1",
+      "name": "Fitness band",
+      "img": null,
+      "cat": "watch",
+      "slot": "wrist",
+      "rarity": "uncommon",
+      "qty": 1,
+      "valueUsd": 90,
+      "detail": "Steps, sleep, pulse.",
+      "source": "inventory",
+      "equipped": true,
+      "assumed": false
+     },
+     {
+      "id": "itm-r1",
+      "name": "Signet ring",
+      "img": null,
+      "cat": "ring",
+      "slot": "finger",
+      "rarity": "rare",
+      "qty": 1,
+      "valueUsd": 70,
+      "detail": "A hand-me-down.",
+      "source": "inventory",
+      "equipped": true,
+      "assumed": true
+     },
+     {
+      "id": "itm-o1",
+      "name": "Phone",
+      "img": null,
+      "cat": "phone",
+      "slot": "offhand",
+      "rarity": "rare",
+      "qty": 1,
+      "valueUsd": 640,
+      "detail": "Maps, tickets, torch.",
+      "source": "inventory",
+      "equipped": true,
+      "assumed": false
+     },
+     {
+      "id": "bag-messenger",
+      "name": "Canvas messenger bag",
+      "img": null,
+      "cat": "bag",
+      "slot": "back",
+      "rarity": "uncommon",
+      "qty": 1,
+      "valueUsd": 130,
+      "detail": "14 L. Opens as its own bag.",
+      "source": "inventory",
+      "equipped": true,
+      "assumed": false,
+      "bagId": "bag-messenger"
+     },
+     {
+      "id": "itm-p1",
+      "name": "Bus pass",
+      "img": null,
+      "cat": "card",
+      "slot": null,
+      "rarity": "common",
+      "qty": 1,
+      "valueUsd": null,
+      "detail": "Monthly.",
+      "source": "inventory"
+     },
+     {
+      "id": "itm-p2",
+      "name": "Flat keys",
+      "img": null,
+      "cat": "key",
+      "slot": null,
+      "rarity": "common",
+      "qty": 1,
+      "valueUsd": null,
+      "detail": "Street door and flat.",
+      "source": "inventory"
+     },
+     {
+      "id": "itm-p3",
+      "name": "Coin purse",
+      "img": null,
+      "cat": "misc",
+      "slot": null,
+      "rarity": "common",
+      "qty": 1,
+      "valueUsd": 9,
+      "detail": "Stall change.",
+      "source": "inventory"
+     }
+    ]
+   },
+   {
+    "id": "bag-messenger",
+    "name": "Canvas messenger bag",
+    "location": "On person",
+    "parent": "bag-person",
+    "kind": "container",
+    "itemId": "bag-messenger",
+    "items": [
+     {
+      "id": "itm-m1",
+      "name": "Laptop, 14 in",
+      "img": null,
+      "cat": "computer",
+      "slot": "mainhand",
+      "rarity": "epic",
+      "qty": 1,
+      "valueUsd": 1350,
+      "detail": "16 GB, silver.",
+      "source": "inventory",
+      "equipped": true,
+      "assumed": false
+     },
+     {
+      "id": "itm-t1",
+      "name": "Pocket notebook",
+      "img": null,
+      "cat": "document",
+      "slot": "trinket1",
+      "rarity": "common",
+      "qty": 1,
+      "valueUsd": 6,
+      "detail": "Lists and sketches.",
+      "source": "inventory",
+      "equipped": true,
+      "assumed": true
+     },
+     {
+      "id": "itm-b1",
+      "name": "Laptop charger",
+      "img": null,
+      "cat": "tech",
+      "slot": null,
+      "rarity": "common",
+      "qty": 1,
+      "valueUsd": 39,
+      "detail": "65 W.",
+      "source": "inventory"
+     },
+     {
+      "id": "itm-b2",
+      "name": "Wired earphones",
+      "img": null,
+      "cat": "audio",
+      "slot": null,
+      "rarity": "common",
+      "qty": 1,
+      "valueUsd": 15,
+      "detail": "With a clip.",
+      "source": "inventory"
+     },
+     {
+      "id": "itm-b3",
+      "name": "Paperback novel",
+      "img": null,
+      "cat": "book",
+      "slot": null,
+      "rarity": "common",
+      "qty": 1,
+      "valueUsd": 11,
+      "detail": "Library copy, due back soon.",
+      "source": "inventory"
+     },
+     {
+      "id": "itm-b4",
+      "name": "Thermos flask",
+      "img": null,
+      "cat": "bottle",
+      "slot": null,
+      "rarity": "common",
+      "qty": 1,
+      "valueUsd": 22,
+      "detail": "Half a litre.",
+      "source": "inventory"
+     },
+     {
+      "id": "itm-b5",
+      "name": "Fountain pen",
+      "img": null,
+      "cat": "tool",
+      "slot": null,
+      "rarity": "uncommon",
+      "qty": 1,
+      "valueUsd": 34,
+      "detail": "Blue-black ink.",
+      "source": "inventory"
+     },
+     {
+      "id": "itm-b6",
+      "name": "Folding umbrella",
+      "img": null,
+      "cat": "misc",
+      "slot": null,
+      "rarity": "common",
+      "qty": 1,
+      "valueUsd": 17,
+      "detail": "One bent rib.",
+      "source": "inventory"
+     }
+    ]
+   },
+   {
+    "id": "bag-cupboard",
+    "name": "Hall cupboard",
+    "location": "Flat",
+    "kind": "location",
+    "itemId": null,
+    "items": [
+     {
+      "id": "itm-c2",
+      "name": "Waxed jacket",
+      "img": null,
+      "cat": "clothes",
+      "slot": "chest",
+      "rarity": "rare",
+      "qty": 1,
+      "valueUsd": 210,
+      "detail": "Rewaxed last autumn.",
+      "source": "inventory"
+     },
+     {
+      "id": "itm-c3",
+      "name": "Striped shirt",
+      "img": null,
+      "cat": "clothes",
+      "slot": "chest",
+      "rarity": "common",
+      "qty": 4,
+      "valueUsd": 27,
+      "detail": "Size L.",
+      "source": "inventory"
+     },
+     {
+      "id": "itm-c4",
+      "name": "Wool jumper",
+      "img": null,
+      "cat": "clothes",
+      "slot": "chest",
+      "rarity": "uncommon",
+      "qty": 2,
+      "valueUsd": 75,
+      "detail": "Bottle green.",
+      "source": "inventory"
+     },
+     {
+      "id": "itm-c5",
+      "name": "Corduroy trousers",
+      "img": null,
+      "cat": "pants",
+      "slot": "legs",
+      "rarity": "uncommon",
+      "qty": 1,
+      "valueUsd": 64,
+      "detail": "Rust.",
+      "source": "inventory"
+     },
+     {
+      "id": "itm-c6",
+      "name": "Swimming trunks",
+      "img": null,
+      "cat": "pants",
+      "slot": "legs",
+      "rarity": "common",
+      "qty": 1,
+      "valueUsd": 21,
+      "detail": "Navy.",
+      "source": "inventory"
+     },
+     {
+      "id": "itm-c7",
+      "name": "Walking boots",
+      "img": null,
+      "cat": "shoes",
+      "slot": "feet",
+      "rarity": "rare",
+      "qty": 1,
+      "valueUsd": 165,
+      "detail": "Leather. About 300 km on them.",
+      "source": "inventory"
+     },
+     {
+      "id": "itm-c8",
+      "name": "Canvas plimsolls",
+      "img": null,
+      "cat": "shoes",
+      "slot": "feet",
+      "rarity": "common",
+      "qty": 1,
+      "valueUsd": 33,
+      "detail": "Off-white.",
+      "source": "inventory"
+     },
+     {
+      "id": "itm-c9",
+      "name": "Flat cap",
+      "img": null,
+      "cat": "hat",
+      "slot": "head",
+      "rarity": "uncommon",
+      "qty": 1,
+      "valueUsd": 41,
+      "detail": "Tweed.",
+      "source": "inventory"
+     },
+     {
+      "id": "itm-c10",
+      "name": "Walking socks",
+      "img": null,
+      "cat": "clothes",
+      "slot": null,
+      "rarity": "common",
+      "qty": 5,
+      "valueUsd": 7,
+      "detail": "Thick.",
+      "source": "inventory"
+     },
+     {
+      "id": "itm-c11",
+      "name": "Scarf",
+      "img": null,
+      "cat": "clothes",
+      "slot": null,
+      "rarity": "common",
+      "qty": 1,
+      "valueUsd": 19,
+      "detail": "Hand-knitted.",
+      "source": "inventory"
+     }
+    ]
+   },
+   {
+    "id": "bag-study",
+    "name": "Study desk",
+    "location": "Flat",
+    "kind": "location",
+    "itemId": null,
+    "items": [
+     {
+      "id": "itm-s1",
+      "name": "Second-hand monitor",
+      "img": null,
+      "cat": "screen",
+      "slot": null,
+      "rarity": "uncommon",
+      "qty": 1,
+      "valueUsd": 88,
+      "detail": "22 in.",
+      "source": "inventory"
+     },
+     {
+      "id": "itm-s2",
+      "name": "Keyboard",
+      "img": null,
+      "cat": "keypad",
+      "slot": null,
+      "rarity": "common",
+      "qty": 1,
+      "valueUsd": 29,
+      "detail": "Membrane, quiet.",
+      "source": "inventory"
+     },
+     {
+      "id": "itm-s3",
+      "name": "Bathroom scale",
+      "img": null,
+      "cat": "scale",
+      "slot": null,
+      "rarity": "common",
+      "qty": 1,
+      "valueUsd": 31,
+      "detail": "Sends weight to the phone.",
+      "source": "inventory"
+     },
+     {
+      "id": "itm-s4",
+      "name": "Thermometer puck",
+      "img": null,
+      "cat": "tech",
+      "slot": null,
+      "rarity": "common",
+      "qty": 1,
+      "valueUsd": 14,
+      "detail": "Room temperature and humidity.",
+      "source": "inventory"
+     },
+     {
+      "id": "itm-s5",
+      "name": "Compact camera",
+      "img": null,
+      "cat": "camera",
+      "slot": null,
+      "rarity": "rare",
+      "qty": 1,
+      "valueUsd": 280,
+      "detail": "Fixed lens.",
+      "source": "inventory"
+     },
+     {
+      "id": "itm-s6",
+      "name": "Chess set",
+      "img": null,
+      "cat": "misc",
+      "slot": null,
+      "rarity": "uncommon",
+      "qty": 1,
+      "valueUsd": 46,
+      "detail": "Weighted pieces.",
+      "source": "inventory"
+     },
+     {
+      "id": "itm-s7",
+      "name": "E-reader",
+      "img": null,
+      "cat": "book",
+      "slot": null,
+      "rarity": "uncommon",
+      "qty": 1,
+      "valueUsd": 95,
+      "detail": "Mostly gardening and history.",
+      "source": "inventory"
+     },
+     {
+      "id": "itm-s8",
+      "name": "Anglepoise lamp",
+      "img": null,
+      "cat": "misc",
+      "slot": null,
+      "rarity": "uncommon",
+      "qty": 1,
+      "valueUsd": 58,
+      "detail": "Cream.",
+      "source": "inventory"
+     }
+    ]
+   },
+   {
+    "id": "bag-shed",
+    "name": "Bike shed",
+    "location": "Flat",
+    "kind": "location",
+    "itemId": null,
+    "items": [
+     {
+      "id": "itm-d1",
+      "name": "Touring bicycle",
+      "img": null,
+      "cat": "sport",
+      "slot": null,
+      "rarity": "epic",
+      "qty": 1,
+      "valueUsd": 520,
+      "detail": "Steel frame, three gears.",
+      "source": "inventory"
+     },
+     {
+      "id": "itm-d2",
+      "name": "Bike pump",
+      "img": null,
+      "cat": "tool",
+      "slot": null,
+      "rarity": "common",
+      "qty": 1,
+      "valueUsd": 16,
+      "detail": "Floor pump.",
+      "source": "inventory"
+     },
+     {
+      "id": "itm-d3",
+      "name": "Pannier",
+      "img": null,
+      "cat": "bag",
+      "slot": null,
+      "rarity": "uncommon",
+      "qty": 2,
+      "valueUsd": 49,
+      "detail": "Waterproof.",
+      "source": "inventory"
+     },
+     {
+      "id": "itm-d4",
+      "name": "Tool roll",
+      "img": null,
+      "cat": "tool",
+      "slot": null,
+      "rarity": "uncommon",
+      "qty": 1,
+      "valueUsd": 37,
+      "detail": "Spanners, levers, patches.",
+      "source": "inventory"
+     },
+     {
+      "id": "itm-d5",
+      "name": "Camping stove",
+      "img": null,
+      "cat": "misc",
+      "slot": null,
+      "rarity": "uncommon",
+      "qty": 1,
+      "valueUsd": 44,
+      "detail": "One burner.",
+      "source": "inventory"
+     },
+     {
+      "id": "itm-d6",
+      "name": "Two-person tent",
+      "img": null,
+      "cat": "misc",
+      "slot": null,
+      "rarity": "rare",
+      "qty": 1,
+      "valueUsd": 190,
+      "detail": "Used four nights.",
+      "source": "inventory"
+     }
+    ]
+   }
+  ]
+ },
+ "treasury": {
+  "currency": "USD",
+  "gold": {
+   "value": 39220,
+   "detail": "Cash and savings, less what is owed on the store card",
+   "source": "bank-feed",
+   "asOf": "2026-09-22T16:12:00Z",
+   "stale": false
+  },
+  "runway": {
+   "days": 212,
+   "burnPerDay": 185
+  },
+  "accounts": [
+   {
+    "id": "acc-0",
+    "name": "Savings account",
+    "kind": "cash",
+    "value": 21900,
+    "source": "bank-feed",
+    "asOf": "2026-09-22T16:12:00Z"
+   },
+   {
+    "id": "acc-1",
+    "name": "Everyday account",
+    "kind": "cash",
+    "value": 6480,
+    "source": "bank-feed",
+    "asOf": "2026-09-22T16:12:00Z"
+   },
+   {
+    "id": "acc-2",
+    "name": "Rainy-day jar",
+    "kind": "cash",
+    "value": 11750,
+    "source": "bank-feed",
+    "asOf": "2026-09-22T15:57:00Z"
+   },
+   {
+    "id": "acc-3",
+    "name": "Index fund",
+    "kind": "asset",
+    "value": 14300,
+    "source": "bank-feed",
+    "asOf": "2026-09-21T21:15:00Z"
+   },
+   {
+    "id": "acc-4",
+    "name": "Store card",
+    "kind": "debt",
+    "value": -910,
+    "source": "bank-feed",
+    "asOf": "2026-09-22T15:43:00Z"
+   }
+  ],
+  "income": [
+   {
+    "name": "Day job salary",
+    "period": "month",
+    "value": 4150,
+    "source": "bank-rules",
+    "asOf": "2026-09-22T16:12:00Z",
+    "payments": 2
+   },
+   {
+    "name": "Weekend tutoring",
+    "period": "month",
+    "value": 620,
+    "source": "bank-feed",
+    "asOf": "2026-09-19T15:05:00Z",
+    "payments": 3
+   }
+  ],
+  "btc": {
+   "price": 91400,
+   "drawdownPct": -18.5,
+   "phase": "Recovery",
+   "source": "coingecko",
+   "asOf": "2026-09-22T17:14:00Z"
+  },
+  "history": [
+   {
+    "d": "2026-08-24",
+    "gold": 40625
+   },
+   {
+    "d": "2026-08-25",
+    "gold": 40435
+   },
+   {
+    "d": "2026-08-26",
+    "gold": 40275
+   },
+   {
+    "d": "2026-08-27",
+    "gold": 40045
+   },
+   {
+    "d": "2026-08-28",
+    "gold": 39895
+   },
+   {
+    "d": "2026-08-29",
+    "gold": 39720
+   },
+   {
+    "d": "2026-08-30",
+    "gold": 39510
+   },
+   {
+    "d": "2026-08-31",
+    "gold": 41585
+   },
+   {
+    "d": "2026-09-01",
+    "gold": 41445
+   },
+   {
+    "d": "2026-09-02",
+    "gold": 41185
+   },
+   {
+    "d": "2026-09-03",
+    "gold": 41000
+   },
+   {
+    "d": "2026-09-04",
+    "gold": 40830
+   },
+   {
+    "d": "2026-09-05",
+    "gold": 40410
+   },
+   {
+    "d": "2026-09-06",
+    "gold": 40260
+   },
+   {
+    "d": "2026-09-07",
+    "gold": 40065
+   },
+   {
+    "d": "2026-09-08",
+    "gold": 39900
+   },
+   {
+    "d": "2026-09-09",
+    "gold": 39720
+   },
+   {
+    "d": "2026-09-10",
+    "gold": 39515
+   },
+   {
+    "d": "2026-09-11",
+    "gold": 39370
+   },
+   {
+    "d": "2026-09-12",
+    "gold": 39200
+   },
+   {
+    "d": "2026-09-13",
+    "gold": 38590
+   },
+   {
+    "d": "2026-09-14",
+    "gold": 40665
+   },
+   {
+    "d": "2026-09-15",
+    "gold": 40510
+   },
+   {
+    "d": "2026-09-16",
+    "gold": 40320
+   },
+   {
+    "d": "2026-09-17",
+    "gold": 40145
+   },
+   {
+    "d": "2026-09-18",
+    "gold": 39915
+   },
+   {
+    "d": "2026-09-19",
+    "gold": 39755
+   },
+   {
+    "d": "2026-09-20",
+    "gold": 39570
+   },
+   {
+    "d": "2026-09-21",
+    "gold": 39420
+   },
+   {
+    "d": "2026-09-22",
+    "gold": 39220
+   }
+  ]
+ },
+ "world": {
+  "current": {
+   "name": "Marlow Cove",
+   "lat": -23.1,
+   "lon": -44.6
+  },
+  "places": [
+   {
+    "name": "Ferry Point",
+    "lat": -24.2,
+    "lon": -46.3,
+    "kind": "city",
+    "visits": 16,
+    "first": "2021-12-05",
+    "last": "2026-09-10"
+   },
+   {
+    "name": "Almera",
+    "lat": 9.6,
+    "lon": -83.9,
+    "kind": "city",
+    "visits": 4,
+    "first": "2023-04-22",
+    "last": "2025-08-02"
+   },
+   {
+    "name": "Marlow Cove",
+    "lat": -23.1,
+    "lon": -44.6,
+    "kind": "home",
+    "visits": 3,
+    "first": "2024-06-29",
+    "last": "2026-09-22"
+   },
+   {
+    "name": "Greyfell",
+    "lat": 53.4,
+    "lon": -7.8,
+    "kind": "country",
+    "visits": 2,
+    "first": "2019-03-30",
+    "last": "2022-09-11"
+   },
+   {
+    "name": "Kestrel Bay",
+    "lat": -21.6,
+    "lon": -41.9,
+    "kind": "city",
+    "visits": 9,
+    "first": "2022-01-16",
+    "last": "2026-08-06"
+   },
+   {
+    "name": "Tanager",
+    "lat": 19.7,
+    "lon": -99.4,
+    "kind": "city",
+    "visits": 3,
+    "first": "2015-02-20",
+    "last": "2024-03-08"
+   },
+   {
+    "name": "Silverton",
+    "lat": 52.3,
+    "lon": 20.7,
+    "kind": "city",
+    "visits": 1,
+    "first": "2018-08-09",
+    "last": "2018-08-15"
+   },
+   {
+    "name": "Port Hallam",
+    "lat": -33.6,
+    "lon": 19.4,
+    "kind": "city",
+    "visits": 2,
+    "first": "2013-09-14",
+    "last": "2017-04-26"
+   },
+   {
+    "name": "Cordoba Alta",
+    "lat": -13.4,
+    "lon": -72.2,
+    "kind": "city",
+    "visits": 1,
+    "first": "2022-10-18",
+    "last": "2022-10-27"
+   },
+   {
+    "name": "Dunmere",
+    "lat": 30.6,
+    "lon": -9.1,
+    "kind": "city",
+    "visits": 2,
+    "first": "2024-01-13",
+    "last": "2025-11-19"
+   }
+  ],
+  "countries": 8,
+  "distanceKm": 61300,
+  "source": "location-feed",
+  "asOf": "2026-09-22T17:18:00Z"
+ },
+ "party": [
+  {
+   "id": "desmond",
+   "name": "Desmond Okoro",
+   "role": "friend",
+   "views": [
+    "squad",
+    "chess"
+   ],
+   "bond": 63,
+   "location": "Ferry Point",
+   "lastContact": "2026-09-21T14:25:00Z",
+   "strengths": "Patient teacher, never rushes a move",
+   "weaknesses": "Cancels when it rains",
+   "supportThem": "Lend him the tent in October",
+   "supportMe": "Thursday chess",
+   "img": null,
+   "touchDays30": 9,
+   "source": "crm+chat",
+   "asOf": "2026-09-21T14:25:00Z"
+  },
+  {
+   "id": "philippa",
+   "name": "Aunt Philippa",
+   "role": "family",
+   "views": [
+    "family"
+   ],
+   "bond": 71,
+   "location": "Greyfell",
+   "lastContact": "2026-09-15T15:25:00Z",
+   "strengths": "Remembers every birthday",
+   "weaknesses": null,
+   "supportThem": "A letter a month",
+   "supportMe": "Recipes by post",
+   "img": null,
+   "touchDays30": 2,
+   "source": "crm+chat",
+   "asOf": "2026-09-15T15:25:00Z"
+  },
+  {
+   "id": "kwame",
+   "name": "Kwame Asante",
+   "role": "team",
+   "views": [
+    "company"
+   ],
+   "bond": 48,
+   "location": "Ferry Point",
+   "lastContact": "2026-09-20T20:25:00Z",
+   "strengths": "Good with the stall customers",
+   "weaknesses": "Late with the float sheet",
+   "supportThem": null,
+   "supportMe": "Covers the early shift",
+   "img": null,
+   "touchDays30": 4,
+   "source": "crm+chat",
+   "asOf": "2026-09-20T20:25:00Z"
+  },
+  {
+   "id": "marisol",
+   "name": "Marisol Quint",
+   "role": "close",
+   "views": [
+    "squad",
+    "hiking"
+   ],
+   "bond": 86,
+   "location": "Kestrel Bay",
+   "lastContact": "2026-09-21T19:55:00Z",
+   "strengths": "Plans a route in five minutes",
+   "weaknesses": "Walks too fast",
+   "supportThem": "Help her move flat next month",
+   "supportMe": "Gets him out of the house",
+   "img": null,
+   "touchDays30": 12,
+   "source": "crm+chat",
+   "asOf": "2026-09-21T19:55:00Z"
+  },
+  {
+   "id": "priya",
+   "name": "Priya Raman",
+   "role": "friend",
+   "views": [
+    "bookclub"
+   ],
+   "bond": null,
+   "location": "Marlow Cove",
+   "lastContact": "2026-09-04T14:25:00Z",
+   "strengths": "Reads everything first",
+   "weaknesses": "Rarely answers the phone",
+   "supportThem": "Pass on the garden book",
+   "supportMe": null,
+   "img": null,
+   "touchDays30": 1,
+   "source": "crm+chat",
+   "asOf": "2026-09-04T14:25:00Z"
+  },
+  {
+   "id": "beatrix",
+   "name": "Beatrix Lowe",
+   "role": "team",
+   "views": [
+    "company",
+    "bookclub"
+   ],
+   "bond": 57,
+   "location": "Marlow Cove",
+   "lastContact": "2026-09-18T16:45:00Z",
+   "strengths": "Keeps the co-op books straight",
+   "weaknesses": null,
+   "supportThem": "Label the price cards",
+   "supportMe": "Reminds everyone of the rota",
+   "img": null,
+   "touchDays30": 3,
+   "source": "crm+chat",
+   "asOf": "2026-09-18T16:45:00Z"
+  },
+  {
+   "id": "arthur",
+   "name": "Grandpa Arthur",
+   "role": "family",
+   "views": [
+    "family"
+   ],
+   "bond": 90,
+   "location": "Dunmere",
+   "lastContact": "2026-09-19T17:05:00Z",
+   "strengths": "Stories, and a steady hand with tools",
+   "weaknesses": "Will not use video calls",
+   "supportThem": "Help in his garden in spring",
+   "supportMe": "Taught him to fix a bike",
+   "img": null,
+   "touchDays30": 5,
+   "source": "crm+chat",
+   "asOf": "2026-09-19T17:05:00Z"
+  }
+ ],
+ "companion": {
+  "name": "Juniper",
+  "status": "warn",
+  "source": "fleet-check",
+  "asOf": "2026-09-22T17:20:00Z",
+  "hosts": [
+   {
+    "id": "kitchen-pi",
+    "name": "kitchen-pi",
+    "state": "ok",
+    "where": "Marlow Cove · kitchen shelf",
+    "detail": "healthy",
+    "lastSeen": "2026-09-22T17:20:00Z",
+    "source": "host-ping",
+    "asOf": "2026-09-22T17:20:00Z"
+   },
+   {
+    "id": "study-laptop",
+    "name": "study-laptop",
+    "state": "ok",
+    "where": "Marlow Cove · study",
+    "detail": "healthy",
+    "lastSeen": "2026-09-22T17:20:00Z",
+    "source": "host-ping",
+    "asOf": "2026-09-22T17:20:00Z"
+   },
+   {
+    "id": "spare-tablet",
+    "name": "spare-tablet",
+    "state": "warn",
+    "where": "Marlow Cove · hallway",
+    "detail": "slow to answer for 40 min",
+    "lastSeen": "2026-09-22T16:39:00Z",
+    "source": "host-ping",
+    "asOf": "2026-09-22T17:20:00Z"
+   }
+  ],
+  "skills": 37,
+  "automations": 12,
+  "sessionsToday": 4,
+  "mana": {
+   "value": 81,
+   "detail": "About a fifth of this week's allowance used"
+  },
+  "headline": "1 host slow",
+  "statsSource": "local+run-log",
+  "statsAsOf": "2026-09-22T17:16:00Z",
+  "automationRuns": {
+   "ok": 164,
+   "fail": 3
+  }
+ },
+ "needs": [
+  {
+   "tier": 1,
+   "label": "Biological",
+   "unlocked": true,
+   "items": [
+    {
+     "label": "Sleep",
+     "state": "ok",
+     "detail": "7 h 36 m last night",
+     "source": "apple-health"
+    },
+    {
+     "label": "Food",
+     "state": "warn",
+     "detail": "52 g of protein still to eat today",
+     "source": "meal-log"
+    },
+    {
+     "label": "Movement",
+     "state": "warn",
+     "detail": "Half the step goal by mid-afternoon",
+     "source": "apple-watch"
+    },
+    {
+     "label": "Shelter",
+     "state": "ok",
+     "detail": "Flat rent paid for October",
+     "source": "tasks"
+    }
+   ]
+  },
+  {
+   "tier": 2,
+   "label": "Safety",
+   "unlocked": true,
+   "items": [
+    {
+     "label": "Runway",
+     "state": "ok",
+     "detail": "212 days; the line is 180",
+     "source": "bank-feed"
+    },
+    {
+     "label": "Bus pass",
+     "state": "warn",
+     "detail": "Runs out in 8 days",
+     "source": "tasks"
+    },
+    {
+     "label": "Eye test",
+     "state": "warn",
+     "detail": "Not booked yet",
+     "source": "tasks"
+    },
+    {
+     "label": "Backups",
+     "state": "ok",
+     "detail": "Photos copied 2 days ago",
+     "source": "fleet-check"
+    }
+   ]
+  },
+  {
+   "tier": 3,
+   "label": "Belonging",
+   "unlocked": true,
+   "items": [
+    {
+     "label": "Close friends",
+     "state": "ok",
+     "detail": "Saw Marisol on Monday",
+     "source": "chat-sync"
+    },
+    {
+     "label": "Family",
+     "state": "warn",
+     "detail": "No call with a relative this week",
+     "source": "chat-sync"
+    },
+    {
+     "label": "Community",
+     "state": "ok",
+     "detail": "Two co-op shifts this month",
+     "source": "tasks"
+    }
+   ]
+  },
+  {
+   "tier": 4,
+   "label": "Esteem",
+   "unlocked": false,
+   "items": [
+    {
+     "label": "Mastery",
+     "state": "unknown",
+     "detail": "No signal",
+     "source": null
+    },
+    {
+     "label": "Recognition",
+     "state": "unknown",
+     "detail": "No signal",
+     "source": null
+    }
+   ]
+  },
+  {
+   "tier": 5,
+   "label": "Self-actualisation",
+   "unlocked": false,
+   "items": [
+    {
+     "label": "Purpose",
+     "state": "unknown",
+     "detail": "No signal",
+     "source": null
+    },
+    {
+     "label": "Impact",
+     "state": "unknown",
+     "detail": "No signal",
+     "source": null
+    }
+   ]
+  }
+ ],
+ "log": [
+  {
+   "id": "log-412",
+   "ts": "2026-09-22T17:21:00Z",
+   "type": "steps",
+   "text": "6,420 steps so far",
+   "xp": {
+    "area": "body",
+    "amount": 8
+   },
+   "icon": "steps",
+   "source": "apple-watch"
+  },
+  {
+   "id": "log-411",
+   "ts": "2026-09-22T16:40:00Z",
+   "type": "task",
+   "text": "Task done: Count the stall float",
+   "xp": {
+    "area": "wealth",
+    "amount": 22
+   },
+   "icon": "task",
+   "source": "tasks"
+  },
+  {
+   "id": "log-410",
+   "ts": "2026-09-22T15:49:00Z",
+   "type": "meal",
+   "text": "Meal logged: lentil soup, bread, an apple · 29 g protein",
+   "xp": {
+    "area": "body",
+    "amount": 4
+   },
+   "icon": "meal",
+   "source": "meal-log"
+  },
+  {
+   "id": "log-409",
+   "ts": "2026-09-22T15:27:00Z",
+   "type": "travel",
+   "text": "Left the flat for a walk along the quay",
+   "xp": null,
+   "icon": "travel",
+   "source": "location-feed"
+  },
+  {
+   "id": "log-408",
+   "ts": "2026-09-22T14:34:00Z",
+   "type": "quest",
+   "text": "Quest complete: One focus block",
+   "xp": {
+    "area": "mind",
+    "amount": 31
+   },
+   "icon": "quest",
+   "source": "engine"
+  },
+  {
+   "id": "log-407",
+   "ts": "2026-09-22T12:30:00Z",
+   "type": "money",
+   "text": "Salary received: $2,075",
+   "xp": {
+    "area": "wealth",
+    "amount": 36
+   },
+   "icon": "money",
+   "source": "bank-feed"
+  },
+  {
+   "id": "log-406",
+   "ts": "2026-09-22T10:05:00Z",
+   "type": "sleep",
+   "text": "Slept 7 h 36 m · woke 07:05",
+   "xp": {
+    "area": "body",
+    "amount": 27
+   },
+   "icon": "sleep",
+   "source": "apple-health"
+  },
+  {
+   "id": "log-405",
+   "ts": "2026-09-22T09:33:00Z",
+   "type": "weigh",
+   "text": "Weighed in: 78.4 kg (−0.1)",
+   "xp": {
+    "area": "body",
+    "amount": 4
+   },
+   "icon": "weigh",
+   "source": "smart-scale"
+  },
+  {
+   "id": "log-404",
+   "ts": "2026-09-21T21:10:00Z",
+   "type": "workout",
+   "text": "Evening swim · 34 min · 290 kcal",
+   "xp": {
+    "area": "joy",
+    "amount": 26
+   },
+   "icon": "workout",
+   "source": "apple-watch"
+  },
+  {
+   "id": "log-403",
+   "ts": "2026-09-21T19:55:00Z",
+   "type": "task",
+   "text": "Task done: Mend the coat pocket",
+   "xp": {
+    "area": "things",
+    "amount": 11
+   },
+   "icon": "task",
+   "source": "tasks"
+  },
+  {
+   "id": "log-402",
+   "ts": "2026-09-21T18:00:00Z",
+   "type": "money",
+   "text": "Card: $23 at the greengrocer",
+   "xp": null,
+   "icon": "money",
+   "source": "bank-feed"
+  },
+  {
+   "id": "log-401",
+   "ts": "2026-09-21T14:25:00Z",
+   "type": "system",
+   "text": "Juniper: photo backup finished, 3,140 files",
+   "xp": null,
+   "icon": "system",
+   "source": "fleet-check"
+  },
+  {
+   "id": "log-400",
+   "ts": "2026-09-20T20:25:00Z",
+   "type": "task",
+   "text": "Co-op stall shift: 4 h on the till",
+   "xp": {
+    "area": "impact",
+    "amount": 44
+   },
+   "icon": "task",
+   "source": "tasks"
+  },
+  {
+   "id": "log-399",
+   "ts": "2026-09-20T19:25:00Z",
+   "type": "money",
+   "text": "Stall takings banked: $412",
+   "xp": {
+    "area": "wealth",
+    "amount": 14
+   },
+   "icon": "money",
+   "source": "bank-feed"
+  },
+  {
+   "id": "log-398",
+   "ts": "2026-09-20T12:15:00Z",
+   "type": "level",
+   "text": "Mind reached level 8",
+   "xp": null,
+   "icon": "level",
+   "source": "engine"
+  },
+  {
+   "id": "log-397",
+   "ts": "2026-09-19T17:35:00Z",
+   "type": "workout",
+   "text": "Long walk · 14 km · 3 h 05 m",
+   "xp": {
+    "area": "body",
+    "amount": 48
+   },
+   "icon": "workout",
+   "source": "apple-watch"
+  },
+  {
+   "id": "log-396",
+   "ts": "2026-09-19T04:55:00Z",
+   "type": "task",
+   "text": "Task done: Replace the bike tyre",
+   "xp": {
+    "area": "things",
+    "amount": 16
+   },
+   "icon": "task",
+   "source": "tasks"
+  }
+ ],
+ "achievements": [
+  {
+   "id": "ach-1",
+   "title": "Half a year in the bank",
+   "detail": "Savings passed six months of living costs",
+   "date": "2026-09-04",
+   "rarity": "epic"
+  },
+  {
+   "id": "ach-2",
+   "title": "Three weeks of honest plates",
+   "detail": "Meals logged 21 days running",
+   "date": "2026-09-20",
+   "rarity": "uncommon"
+  },
+  {
+   "id": "ach-3",
+   "title": "Fourteen-kilometre day",
+   "detail": "The longest walk so far",
+   "date": "2026-09-19",
+   "rarity": "rare"
+  },
+  {
+   "id": "ach-4",
+   "title": "Shelf by shelf",
+   "detail": "First 20 books photographed for the catalogue",
+   "date": "2026-08-24",
+   "rarity": "common"
+  },
+  {
+   "id": "ach-5",
+   "title": "Stallholder",
+   "detail": "Ten shifts at the co-op stall",
+   "date": "2026-06-06",
+   "rarity": "uncommon"
+  },
+  {
+   "id": "ach-6",
+   "title": "Helper on the shelf",
+   "detail": "Juniper finished a week of jobs without a retry",
+   "date": "2026-04-19",
+   "rarity": "legendary"
+  }
+ ],
+ "day": {
+  "date": "2026-09-22",
+  "n": 13271,
+  "xp": 142,
+  "questsDone": 2,
+  "questsTotal": 5,
+  "grade": "C",
+  "calendarDate": "2026-09-22",
+  "basis": "calendar",
+  "endsAt": "2026-09-23T03:00:00Z",
+  "readiness": 83,
+  "xpMultiplier": 1.11,
+  "yesterday": {
+   "date": "2026-09-21",
+   "questsDone": 4,
+   "questsTotal": 5,
+   "grade": "A",
+   "xp": 233
+  },
+  "lastClose": {
+   "date": "2026-09-21",
+   "grade": "A",
+   "xp": 233,
+   "questsDone": 4,
+   "questsTotal": 5,
+   "completed": [
+    {
+     "id": "d-steps",
+     "title": "Walk 12,000 steps"
+    },
+    {
+     "id": "d-meals",
+     "title": "Log three meals"
+    },
+    {
+     "id": "d-protein",
+     "title": "Eat 140 g of protein"
+    },
+    {
+     "id": "d-focus",
+     "title": "One focus block"
+    }
+   ],
+   "missed": [
+    {
+     "id": "d-sleep",
+     "title": "Sleep seven and a half hours"
+    }
+   ],
+   "streaks": [
+    {
+     "id": "diary",
+     "label": "Food diary kept",
+     "state": "kept",
+     "length": 22,
+     "unit": "days"
+    },
+    {
+     "id": "steps-goal",
+     "label": "Step goal",
+     "state": "kept",
+     "length": 3,
+     "unit": "days"
+    },
+    {
+     "id": "sleep",
+     "label": "Slept seven hours",
+     "state": "broken",
+     "length": 0,
+     "unit": "nights"
+    }
+   ],
+   "notable": [],
+   "closedAt": "2026-09-22T03:00:00Z",
+   "text": "Day closed: grade A · 233 XP · 4 of 5 quests",
+   "speech": "Yesterday closed at grade A with 233 XP and four of five quests done. Only sleep was missed. The food diary and the step goal both held.",
+   "seen": false,
+   "seenAt": null
+  }
+ },
+ "signals": [
+  {
+   "id": "steps",
+   "label": "Steps",
+   "state": "live",
+   "asOf": "2026-09-22T17:21:00Z",
+   "device": "Fitness band"
+  },
+  {
+   "id": "heart",
+   "label": "Heart rate",
+   "state": "live",
+   "asOf": "2026-09-22T16:33:00Z",
+   "device": "Fitness band"
+  },
+  {
+   "id": "sleep",
+   "label": "Sleep",
+   "state": "live",
+   "asOf": "2026-09-22T10:05:00Z",
+   "device": "Apple Health"
+  },
+  {
+   "id": "weight",
+   "label": "Weight",
+   "state": "live",
+   "asOf": "2026-09-22T09:33:00Z",
+   "device": "Bathroom scale"
+  },
+  {
+   "id": "meals",
+   "label": "Meals",
+   "state": "live",
+   "asOf": "2026-09-22T15:49:00Z",
+   "device": "meal-log"
+  },
+  {
+   "id": "location",
+   "label": "Location",
+   "state": "live",
+   "asOf": "2026-09-22T17:18:00Z",
+   "device": "Phone location"
+  },
+  {
+   "id": "weather",
+   "label": "Weather",
+   "state": "live",
+   "asOf": "2026-09-22T16:51:00Z",
+   "device": "Open-Meteo"
+  },
+  {
+   "id": "room",
+   "label": "Room climate",
+   "state": "stale",
+   "asOf": "2026-09-21T08:25:00Z",
+   "device": "Thermometer puck"
+  },
+  {
+   "id": "bank",
+   "label": "Bank balances",
+   "state": "live",
+   "asOf": "2026-09-22T16:12:00Z",
+   "device": "Bank feed"
+  },
+  {
+   "id": "tasks",
+   "label": "Tasks",
+   "state": "live",
+   "asOf": "2026-09-22T16:40:00Z",
+   "device": "Task list"
+  },
+  {
+   "id": "inventory",
+   "label": "Belongings",
+   "state": "stale",
+   "asOf": "2026-09-21T15:30:00Z",
+   "device": "Catalogue"
+  },
+  {
+   "id": "contacts",
+   "label": "Conversations",
+   "state": "live",
+   "asOf": "2026-09-22T14:15:00Z",
+   "device": "Chat sync"
+  },
+  {
+   "id": "focus",
+   "label": "Screen time",
+   "state": "live",
+   "asOf": "2026-09-22T17:04:00Z",
+   "device": "Laptop"
+  },
+  {
+   "id": "fleet",
+   "label": "Companion fleet",
+   "state": "live",
+   "asOf": "2026-09-22T17:20:00Z",
+   "device": "fleet-check"
+  },
+  {
+   "id": "reading",
+   "label": "Reading",
+   "state": "off",
+   "asOf": null,
+   "device": "E-reader"
+  }
+ ],
+ "streaks": [
+  {
+   "id": "diary",
+   "label": "Food diary kept",
+   "unit": "days",
+   "period": "day",
+   "current": 22,
+   "best": 31,
+   "bestEnded": "2026-05-27",
+   "lastDate": "2026-09-21",
+   "hitThisPeriod": false,
+   "alive": true,
+   "rule": "3 or more meals logged"
+  },
+  {
+   "id": "sleep",
+   "label": "Slept seven hours",
+   "unit": "nights",
+   "period": "day",
+   "current": 1,
+   "best": 12,
+   "bestEnded": "2026-07-08",
+   "lastDate": "2026-09-22",
+   "hitThisPeriod": true,
+   "alive": true,
+   "rule": "7 h or more asleep"
+  },
+  {
+   "id": "steps-goal",
+   "label": "Step goal",
+   "unit": "days",
+   "period": "day",
+   "current": 3,
+   "best": 19,
+   "bestEnded": "2026-03-03",
+   "lastDate": "2026-09-21",
+   "hitThisPeriod": false,
+   "alive": true,
+   "rule": "steps at or over the goal"
+  },
+  {
+   "id": "protein",
+   "label": "Protein target",
+   "unit": "days",
+   "period": "day",
+   "current": 2,
+   "best": 8,
+   "bestEnded": "2026-08-11",
+   "lastDate": "2026-09-21",
+   "hitThisPeriod": false,
+   "alive": true,
+   "rule": "protein at 90% or more of the day's target"
+  },
+  {
+   "id": "weigh-ins",
+   "label": "Weekly weigh-in",
+   "unit": "weeks",
+   "period": "week",
+   "current": 11,
+   "best": 11,
+   "bestEnded": "2026-09-22",
+   "lastDate": "2026-09-22",
+   "hitThisPeriod": true,
+   "alive": true,
+   "rule": "at least one weigh-in in the week"
+  }
+ ],
+ "guild": {
+  "id": "guild",
+  "name": "Tidewater Co-op",
+  "currency": "USD",
+  "total": 12640,
+  "detail": "2 shared accounts",
+  "source": "bank-feed",
+  "asOf": "2026-09-22T15:14:00Z",
+  "stale": false,
+  "staleAccounts": [],
+  "accounts": [
+   {
+    "id": "gd-float",
+    "name": "Tidewater · Stall float",
+    "institution": "Cash box",
+    "kind": "cash",
+    "value": 3500,
+    "asOf": "2026-09-22T16:40:00Z",
+    "source": "tasks"
+   },
+   {
+    "id": "gd-till",
+    "name": "Tidewater · Shared till",
+    "institution": "Bank",
+    "kind": "cash",
+    "value": 9140,
+    "asOf": "2026-09-22T15:14:00Z",
+    "source": "bank-feed"
+   }
+  ]
+ },
+ "logTotal": 2317,
+ "brief": {
+  "now": {
+   "kind": "now",
+   "speech": "Closest right now is Log three meals, one meal to go, then Walk 12,000 steps. The food diary streak needs dinner written down. The day ends in about nine and a half hours."
+  },
+  "morning": {
+   "kind": "morning",
+   "speech": "You slept seven hours and thirty six minutes. Readiness is 83, so XP counts a little more today. Five quests are open, and the main quest stands at seven of twelve months saved."
+  },
+  "evening": {
+   "kind": "evening",
+   "speech": "Yesterday closed at grade A with 233 XP and four of five quests done. Sleep carries over. Two streaks held."
+  }
+ }
+}

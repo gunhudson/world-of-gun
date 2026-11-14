@@ -1,0 +1,7 @@
+The first attached image is a front-view 3D character reference of a person in an A-pose. Produce the matching BACK view of the exact same character for a 3D modelling turnaround: the camera is directly behind them, they are facing away from the camera, we see the back of the head, the back of the neck, the back, the backs of the arms, hands, legs and heels.
+
+Keep everything identical to the front view: same A-pose (arms straight, about 40 degrees away from the body, feet shoulder-width apart), same body proportions, same scale and position in the frame (head top and shoe soles at the same heights as in the front view), the same clothes seen from behind ({{CLOTHES}}), {{ACCESSORIES}} No face visible; hair and skin tone as in the front view.
+
+Same style (stylised-realistic game character), same perfectly even shadowless front-on studio lighting, same flat solid light grey background (#c8c8c8). No text, no labels, a single figure only. The other attached photos are of the same real person, for skin tone and head shape only.
+
+Build: exactly as in the front view ({{BUILD}}). Hands: open and relaxed with all five fingers clearly separated (grey background visible between neighbouring fingers), exactly mirroring the front view.

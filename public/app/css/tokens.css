@@ -1,0 +1,308 @@
+/* World of Gun: design tokens and reset. Palette and type from docs/DESIGN.md. */
+:root {
+  /* ---- fixed data colours: the same in every skin ---- */
+  --gold: #d4b06a;
+  --parch: #f3ead8;
+  --cyan: #5ff3e0;
+  --magenta: #c86bff;
+  --green: #5fd38d;
+  --amber: #f0b34a;
+  --danger: #e4574f;
+
+  --r-common: #a9adb8;
+  --r-uncommon: #4fdc7c;
+  --r-rare: #4aa3ff;
+  --r-epic: #b56bff;
+  --r-legendary: #ff9a3d;
+
+  --v-health: #5fd38d;
+  --v-energy: #5ff3e0;
+  --v-stamina: #f0b34a;
+  --v-fuel: #ff8a5c;
+  --v-focus: #c86bff;
+  --v-gold: #d4b06a;
+  --v-xp: #8f7bff;
+
+  --font-body: "Inter", -apple-system, BlinkMacSystemFont, "SF Pro Text", "Helvetica Neue", "Segoe UI", Roboto,
+    system-ui, sans-serif;
+  --font-didot: "Didot", "Didot LT STD", "Bodoni 72", "Bodoni MT", "Playfair Display", "Libre Bodoni", "Hoefler Text",
+    "Times New Roman", serif;
+
+  --ease: cubic-bezier(0.22, 0.8, 0.24, 1);
+  --ease-in: cubic-bezier(0.6, 0, 0.9, 0.4);
+  --sat: env(safe-area-inset-top, 0px);
+  --sar: env(safe-area-inset-right, 0px);
+  --sab: env(safe-area-inset-bottom, 0px);
+  --sal: env(safe-area-inset-left, 0px);
+  --edge: 20px;
+
+  /* ---- skin: Operative (default). Near-black, gold, sleek, restrained ornament. ---- */
+  --accent: #d4b06a;
+  --accent-hi: #f6e2ae;
+  --accent-lo: #8a6c36;
+  --accent-dim: rgba(212, 176, 106, 0.42);
+  --accent-faint: rgba(212, 176, 106, 0.15);
+  --accent-2: #5ff3e0;
+  --ink: #f3ead8;
+  --ink-dim: rgba(243, 234, 216, 0.66);
+  --ink-faint: rgba(243, 234, 216, 0.38);
+  --page: #050608;
+  --glass: linear-gradient(180deg, rgba(17, 18, 23, 0.9), rgba(6, 7, 10, 0.95));
+  --glass-soft: linear-gradient(180deg, rgba(15, 16, 21, 0.7), rgba(6, 7, 10, 0.82));
+  --head: linear-gradient(180deg, rgba(212, 176, 106, 0.1), rgba(212, 176, 106, 0));
+  --well: rgba(0, 0, 0, 0.6);
+  --tile: linear-gradient(160deg, rgba(40, 41, 50, 0.9), rgba(10, 11, 15, 0.95));
+  --blur: 16px;
+  --radius: 3px;
+  --radius-sm: 2px;
+  --border-w: 1px;
+  --inner-line: rgba(212, 176, 106, 0.1);
+  --shadow: 0 24px 70px rgba(0, 0, 0, 0.62), 0 2px 0 rgba(255, 255, 255, 0.03) inset;
+  --glow: 0 0 0 rgba(0, 0, 0, 0);
+  --font-display: var(--font-didot);
+  --display-weight: 400;
+  --display-track: 0.2em;
+  --display-case: uppercase;
+  --display-shadow: 0 1px 12px rgba(0, 0, 0, 0.7);
+  --title-fill: linear-gradient(180deg, #fbefc8 0%, #d4b06a 46%, #8a6c36 100%);
+  --corner-size: 15px;
+  --corner: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24'%3E%3Cpath d='M1 16V1h15' fill='none' stroke='%23000' stroke-width='2'/%3E%3Cpath d='M5.500 5.500h4v4h-4z'/%3E%3C/svg%3E");
+  --vignette: radial-gradient(120% 90% at 50% 45%, transparent 55%, rgba(0, 0, 0, 0.55) 100%);
+}
+
+/* ---- skin: Pandora. Bioluminescent teal and magenta, soft glass, glow. ---- */
+:root[data-skin="pandora"] {
+  --accent: #5ff3e0;
+  --accent-hi: #d9fffa;
+  --accent-lo: #1c8f8a;
+  --accent-dim: rgba(95, 243, 224, 0.42);
+  --accent-faint: rgba(95, 243, 224, 0.13);
+  --accent-2: #c86bff;
+  --ink: #e9fbff;
+  --ink-dim: rgba(233, 251, 255, 0.68);
+  --ink-faint: rgba(233, 251, 255, 0.4);
+  --page: #05070f;
+  --glass: linear-gradient(165deg, rgba(14, 58, 68, 0.72), rgba(10, 13, 28, 0.9) 55%, rgba(48, 22, 74, 0.82));
+  --glass-soft: linear-gradient(165deg, rgba(14, 58, 68, 0.5), rgba(10, 13, 28, 0.74));
+  --head: linear-gradient(180deg, rgba(95, 243, 224, 0.14), rgba(200, 107, 255, 0.03));
+  --well: rgba(3, 8, 18, 0.62);
+  --tile: linear-gradient(160deg, rgba(20, 66, 80, 0.9), rgba(12, 14, 34, 0.95));
+  --blur: 22px;
+  --radius: 14px;
+  --radius-sm: 8px;
+  --inner-line: rgba(200, 107, 255, 0.16);
+  --shadow: 0 24px 70px rgba(0, 0, 0, 0.55), 0 0 34px rgba(95, 243, 224, 0.12);
+  --glow: 0 0 18px rgba(95, 243, 224, 0.35);
+  --font-display: var(--font-body);
+  --display-weight: 300;
+  --display-track: 0.34em;
+  --display-shadow: 0 0 18px rgba(95, 243, 224, 0.6);
+  --title-fill: linear-gradient(180deg, #ffffff 0%, #5ff3e0 50%, #c86bff 100%);
+  --corner-size: 18px;
+  --corner: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24'%3E%3Cpath d='M1.500 20C1.500 9 9 1.500 20 1.500' fill='none' stroke='%23000' stroke-width='1.800' stroke-linecap='round'/%3E%3Ccircle cx='7' cy='7' r='1.900'/%3E%3C/svg%3E");
+  --vignette: radial-gradient(120% 90% at 50% 45%, transparent 50%, rgba(10, 13, 28, 0.6) 100%);
+}
+
+/* ---- skin: Azeroth. Ornate Warcraft-style frames, warmer, heavier serif. ---- */
+:root[data-skin="azeroth"] {
+  --accent: #e0b354;
+  --accent-hi: #ffe9a8;
+  --accent-lo: #7a531c;
+  --accent-dim: rgba(224, 179, 84, 0.55);
+  --accent-faint: rgba(224, 179, 84, 0.18);
+  --accent-2: #ff9a3d;
+  --ink: #f6e7c6;
+  --ink-dim: rgba(246, 231, 198, 0.72);
+  --ink-faint: rgba(246, 231, 198, 0.42);
+  --page: #080503;
+  --glass: linear-gradient(180deg, rgba(46, 31, 18, 0.94), rgba(18, 11, 6, 0.97));
+  --glass-soft: linear-gradient(180deg, rgba(42, 28, 16, 0.78), rgba(16, 10, 6, 0.88));
+  --head: linear-gradient(180deg, rgba(224, 179, 84, 0.24), rgba(122, 83, 28, 0.06));
+  --well: rgba(8, 4, 2, 0.7);
+  --tile: linear-gradient(160deg, rgba(74, 52, 30, 0.95), rgba(22, 14, 8, 0.97));
+  --blur: 8px;
+  --radius: 6px;
+  --radius-sm: 4px;
+  --border-w: 2px;
+  --inner-line: rgba(224, 179, 84, 0.34);
+  --shadow: 0 24px 70px rgba(0, 0, 0, 0.7), 0 0 0 1px #000, 0 0 0 4px rgba(122, 83, 28, 0.35);
+  --font-display: "Bodoni 72", "Hoefler Text", "Palatino", "Book Antiqua", Georgia, serif;
+  --display-weight: 700;
+  --display-track: 0.08em;
+  --display-shadow: 0 2px 0 #000, 0 0 14px rgba(224, 120, 40, 0.45);
+  --title-fill: linear-gradient(180deg, #fff3c4 0%, #e0b354 45%, #9a5a1a 100%);
+  --corner-size: 34px;
+  --corner: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 40 40'%3E%3Cg fill='none' stroke='%23000' stroke-linecap='round'%3E%3Cpath d='M2 36V9a7 7 0 0 1 7-7h27' stroke-width='3'/%3E%3Cpath d='M7.500 27V13a5.500 5.500 0 0 1 5.500-5.500h14' stroke-width='1.200'/%3E%3Cpath d='M2 36c5 0 7.500-2.500 7.500-5.500S6 26.500 5 29M36 2c0 5-2.500 7.500-5.500 7.500S26.500 6 29 5' stroke-width='1.600'/%3E%3C/g%3E%3Cpath d='M14.500 10.500l4 4-4 4-4-4z'/%3E%3C/svg%3E");
+  --vignette: radial-gradient(120% 90% at 50% 45%, transparent 50%, rgba(8, 4, 2, 0.66) 100%);
+}
+
+*,
+*::before,
+*::after {
+  box-sizing: border-box;
+}
+html,
+body {
+  margin: 0;
+  height: 100%;
+  background: var(--page);
+  color: var(--ink);
+  font-family: var(--font-body);
+  font-size: 13px;
+  line-height: 1.4;
+  font-variant-numeric: tabular-nums;
+  font-feature-settings: "tnum" 1, "cv11" 1;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+  overflow: hidden;
+  overscroll-behavior: none;
+  -webkit-text-size-adjust: 100%;
+  -webkit-tap-highlight-color: transparent;
+  -webkit-touch-callout: none;
+  user-select: none;
+  -webkit-user-select: none;
+}
+button {
+  font: inherit;
+  color: inherit;
+  background: none;
+  border: 0;
+  padding: 0;
+  margin: 0;
+  cursor: pointer;
+  touch-action: manipulation;
+}
+button:focus-visible,
+[tabindex]:focus-visible {
+  outline: 1px solid var(--accent-2);
+  outline-offset: 2px;
+}
+h1,
+h2,
+h3,
+h4,
+p,
+ul,
+ol {
+  margin: 0;
+  padding: 0;
+}
+ul,
+ol {
+  list-style: none;
+}
+img {
+  display: block;
+  max-width: 100%;
+}
+svg.ico {
+  width: 1em;
+  height: 1em;
+  flex: none;
+  fill: none;
+  stroke: currentColor;
+  stroke-width: 1.6;
+  stroke-linecap: round;
+  stroke-linejoin: round;
+  overflow: visible;
+}
+svg.ico .f {
+  fill: currentColor;
+  stroke: none;
+}
+svg.ico .d {
+  fill: currentColor;
+  fill-opacity: 0.22;
+  stroke: none;
+}
+
+#stage {
+  position: fixed;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  display: block;
+  touch-action: none;
+}
+#ui {
+  position: fixed;
+  inset: 0;
+  pointer-events: none;
+  overflow: hidden;
+}
+#ui > * {
+  pointer-events: none;
+}
+.hit,
+.hit * {
+  pointer-events: auto;
+}
+
+.display {
+  font-family: var(--font-display);
+  font-weight: var(--display-weight);
+  letter-spacing: var(--display-track);
+  text-transform: var(--display-case);
+}
+.caps {
+  text-transform: uppercase;
+  letter-spacing: 0.18em;
+  font-size: 10px;
+  font-weight: 600;
+}
+.dim {
+  color: var(--ink-dim);
+}
+.faint {
+  color: var(--ink-faint);
+}
+.gold {
+  color: var(--accent);
+}
+.nosig {
+  font-size: 9px;
+  font-weight: 600;
+  letter-spacing: 0.2em;
+  text-transform: uppercase;
+  color: var(--ink-faint);
+  white-space: nowrap;
+}
+
+/* thin scrollbars inside windows */
+.scroll {
+  overflow-y: auto;
+  overflow-x: hidden;
+  overscroll-behavior: contain;
+  -webkit-overflow-scrolling: touch;
+  scrollbar-width: thin;
+  scrollbar-color: var(--accent-dim) transparent;
+}
+.scroll::-webkit-scrollbar {
+  width: 6px;
+}
+.scroll::-webkit-scrollbar-thumb {
+  background: var(--accent-dim);
+  border-radius: 3px;
+}
+.scroll::-webkit-scrollbar-track {
+  background: rgba(0, 0, 0, 0.25);
+}
+
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+  }
+}
+
+/* Overlay route (/?overlay=1): transparent page, no stage. */
+html.overlay,
+html.overlay body {
+  background: transparent !important;
+}
+html.overlay #stage {
+  display: none;
+}

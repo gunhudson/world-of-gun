@@ -1,0 +1,9 @@
+{
+  "note": "Areas are the world's ten: strategy, body, mind, things, people, joy, wealth, connection, growth, impact.",
+  "tasks": [
+    { "id": "task-001", "title": "Book dentist appointment", "area": "body", "priority": "High", "due": "2026-11-20", "done": false },
+    { "id": "task-002", "title": "Send November invoice", "area": "wealth", "priority": "One Thing", "do": "2026-11-15", "done": false },
+    { "id": "task-003", "title": "Call grandma", "area": "people", "done": true, "doneAt": "2026-11-13T18:30:00Z" },
+    { "id": "task-004", "title": "Read two chapters", "area": "mind", "done": false }
+  ]
+}

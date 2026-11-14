@@ -1,0 +1,13 @@
+Create a 3D game character reference image of the person in the attached photos. All photos show the same real person; the output must be clearly recognisable as them.
+
+Subject: one person, full body, head to toe, centred, standing perfectly front-facing to the camera in a relaxed A-pose for 3D modelling: arms straight and held away from the body at about 40 degrees, palms facing the thighs, fingers slightly apart, feet shoulder-width apart and flat on the floor, toes pointing forward, shoulders level, head straight, looking at the camera. Camera at chest height, long lens, orthographic feel, no perspective distortion, the whole figure inside the frame with a margin above the head and below the shoes.
+
+Likeness (keep exactly from the photos): {{LIKENESS}}. Expression: calm, a slight closed-mouth smile, mouth closed, no teeth.
+
+Build: {{HEIGHT_CM}} cm tall, {{BUILD}}. Do not exaggerate muscle; draw the build the photos show.
+
+Clothes (their real everyday wardrobe): {{CLOTHES}}. {{ACCESSORIES}} No hat, no glasses, no headphones, no armour, no weapons, nothing that is not listed.
+
+Style: stylised-realistic game hero, the way a modern MMORPG cinematic renders a player character (high-end real-time character art, slightly idealised and cleaner than a photo, subtle sculpted planes in the face, believable skin and cloth materials). Not a cartoon, not anime, not a photo.
+
+Lighting and background: perfectly even, soft, shadowless studio lighting from the front (albedo-like, no rim light, no dramatic shadows, no cast shadow on the floor), on a flat solid light grey background (#c8c8c8). No text, no labels, no extra views, no border, a single figure only.

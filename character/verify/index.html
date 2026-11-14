@@ -1,0 +1,69 @@
+<!doctype html>
+<!-- Standalone check page for public/models/gun.glb (served from the repo root, see README "Verify").
+     ?clip=idle&t=1.2&view=front|q|face|faceq|bust|side|back|wide&cam=x,y,z&look=x,y,z&fov=28
+     &morph=heavy:1,muscular:0.5&bg=0 (transparent)&hud=0&play=1&model=/public/models/gun.glb -->
+<meta charset="utf-8"><title>gun.glb check</title>
+<style>html,body{margin:0;height:100%;background:#0a0d1c;overflow:hidden}canvas{display:block}#hud{position:fixed;left:8px;top:6px;color:#f3ead8;font:12px/1.4 ui-monospace,monospace;white-space:pre}</style>
+<script type="importmap">{ "imports": { "three": "/public/vendor/three/build/three.module.min.js", "three/addons/": "/public/vendor/three/addons/" } }</script>
+<div id="hud"></div>
+<script type="module">
+import * as THREE from "three";
+import { GLTFLoader } from "three/addons/loaders/GLTFLoader.js";
+import { RoomEnvironment } from "three/addons/environments/RoomEnvironment.js";
+import { MeshoptDecoder } from "three/addons/libs/meshopt_decoder.module.js";   // the vendored decoder, as the stage uses it
+const q = new URLSearchParams(location.search);
+const transparent = q.get("bg") === "0";
+if (transparent) document.documentElement.style.background = document.body.style.background = "transparent";
+const renderer = new THREE.WebGLRenderer({ antialias: true, alpha: transparent, preserveDrawingBuffer: true });
+renderer.setPixelRatio(Number(q.get("dpr") || 1)); renderer.setSize(innerWidth, innerHeight);
+renderer.toneMapping = THREE.ACESFilmicToneMapping; renderer.toneMappingExposure = Number(q.get("exp") || 1.0);
+renderer.shadowMap.enabled = true;
+document.body.appendChild(renderer.domElement);
+const scene = new THREE.Scene();
+if (!transparent) scene.background = new THREE.Color(q.get("bgc") ? "#" + q.get("bgc") : "#1b2030");
+const pm = new THREE.PMREMGenerator(renderer);
+scene.environment = pm.fromScene(new RoomEnvironment(), 0.04).texture; scene.environmentIntensity = Number(q.get("env") || 0.75);
+const key = new THREE.DirectionalLight(0xfff1dd, 2.2); key.position.set(1.5, 3, 3); key.castShadow = true; scene.add(key);
+const rim = new THREE.DirectionalLight(0x5ff3e0, Number(q.get("rim") || 0.9)); rim.position.set(-2, 2.2, -3); scene.add(rim);
+if (!transparent) { const g = new THREE.Mesh(new THREE.CircleGeometry(1.4, 64), new THREE.MeshStandardMaterial({ color: 0x2a3146, roughness: 0.9 })); g.rotation.x = -Math.PI / 2; g.receiveShadow = true; scene.add(g); }
+const cam = new THREE.PerspectiveCamera(Number(q.get("fov") || 28), innerWidth / innerHeight, 0.05, 50);
+const views = { front: [[0, 1.0, 4.6], [0, 0.95, 0]], q: [[2.9, 1.25, 3.6], [0, 0.95, 0]], side: [[4.6, 1.0, 0], [0, 0.95, 0]], back: [[-1.2, 1.2, -4.4], [0, 0.95, 0]],
+  face: [[0.05, 1.70, 1.05], [0, 1.675, 0]], faceq: [[0.62, 1.72, 0.85], [0, 1.675, 0]], bust: [[0.25, 1.62, 1.75], [0, 1.52, 0]], wide: [[0, 1.3, 6.4], [0, 1.25, 0]] };
+const v = views[q.get("view") || "front"].map((a) => a.slice());
+if (q.get("cam")) v[0] = q.get("cam").split(",").map(Number);
+if (q.get("look")) v[1] = q.get("look").split(",").map(Number);
+cam.position.set(...v[0]); cam.lookAt(...v[1]);
+const hud = document.getElementById("hud");
+new GLTFLoader().setMeshoptDecoder(MeshoptDecoder).load(q.get("model") || "/character/work/out/gun.glb", (gltf) => {
+  const model = gltf.scene; scene.add(model);
+  // flat=1: clay grey on every mesh (geometry and normals only, no colour), to tell a texture edge from a geometric one
+  if (q.get("flat") === "1") model.traverse((o) => { if (o.isMesh) o.material = new THREE.MeshStandardMaterial({ color: 0x9a9a9a, roughness: 0.8, skinning: true }); });
+  // tex=/public/tex/gun_body_<outfit>[_lite]: an outfit's published colour + ORM maps on the body material (outfits.sh)
+  let texPending = 0; const texDone = () => { if (--texPending === 0) requestAnimationFrame(() => { renderer.render(scene, cam); window.__ready = true; }); };
+  if (q.get("tex")) model.traverse((o) => { if (!o.isMesh) return; for (const m of Array.isArray(o.material) ? o.material : [o.material]) { if (!/body/i.test(m.name || "")) continue;
+    const tl = new THREE.TextureLoader(); const set = (t, old, srgb) => { texPending++; t.flipY = false; t.colorSpace = srgb ? THREE.SRGBColorSpace : THREE.NoColorSpace; if (old) { t.anisotropy = old.anisotropy; t.wrapS = old.wrapS; t.wrapT = old.wrapT; t.offset.copy(old.offset); t.repeat.copy(old.repeat); t.rotation = old.rotation; t.center.copy(old.center); t.channel = old.channel; } return t; };
+    m.map = set(tl.load(q.get("tex") + ".jpg", texDone), m.map, true); m.roughnessMap = m.metalnessMap = set(tl.load(q.get("tex") + "_orm.jpg", texDone), m.roughnessMap, false); m.needsUpdate = true; } });
+  let tris = 0;
+  model.traverse((o) => { if (o.isMesh) { o.castShadow = true; o.frustumCulled = false; tris += o.geometry.index.count / 3;
+    for (const m of (q.get("morph") || "").split(",").filter(Boolean)) { const [n, w] = m.split(":"); const i = o.morphTargetDictionary?.[n]; if (i !== undefined) o.morphTargetInfluences[i] = Number(w); } } });
+  const mixer = new THREE.AnimationMixer(model);
+  const name = q.get("clip") || "idle";
+  const clip = gltf.animations.find((c) => c.name === name);
+  if (clip && name !== "rest") mixer.clipAction(clip).play();
+  if (q.get("add")) {   // additive pose on top of the base clip, the three.js way: add=sad_pose:0.75
+    const [an, aw] = q.get("add").split(":"); const src = gltf.animations.find((c) => c.name === an);
+    let add = THREE.AnimationUtils.makeClipAdditive(src.clone());            // key 0 of the clip is the reference stance
+    add = THREE.AnimationUtils.subclip(add, add.name, 2, 3, 30);            // keep one held pose frame
+    const a = mixer.clipAction(add); a.blendMode = THREE.AdditiveAnimationBlendMode; a.setEffectiveWeight(Number(aw || 1)); a.play();
+  }
+  const t0 = Number(q.get("t") || 0); mixer.setTime(t0);
+  const box = new THREE.Box3().setFromObject(model);
+  if (q.get("hud") !== "0") hud.textContent = `clips: ${gltf.animations.map((c) => c.name + " " + c.duration.toFixed(2) + "s").join(", ")}\n${name} @ ${t0}s | tris ${tris} | bind bbox y ${box.min.y.toFixed(3)}..${box.max.y.toFixed(3)}`;
+  const morphs = []; model.traverse((o) => { if (o.isMesh && o.morphTargetDictionary) morphs.push(Object.keys(o.morphTargetDictionary).join(",")); });
+  const bones = []; model.traverse((o) => { if (o.isBone) bones.push(o.name); });
+  window.__info = { morphs, bones: bones.length, hips: !!model.getObjectByName("mixamorigHips"), ext: gltf.parser.json.extensionsUsed || [], clips: gltf.animations.map((c) => [c.name, c.duration]), tris, box: [box.min.toArray(), box.max.toArray()] };
+  const clock = new THREE.Clock();
+  const tick = () => { if (q.get("play") === "1") mixer.update(clock.getDelta()); renderer.render(scene, cam); if (q.get("play") === "1") requestAnimationFrame(tick); };
+  tick(); requestAnimationFrame(() => { renderer.render(scene, cam); if (!texPending) window.__ready = true; });
+}, undefined, (e) => { hud.textContent = "load failed: " + e; window.__ready = "error"; });
+</script>

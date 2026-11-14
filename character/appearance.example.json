@@ -1,0 +1,9 @@
+{
+  "_comment": "Copy to appearance.json (git-ignored) and describe YOUR character. scripts/gen_image.py fills the {{KEY}} placeholders in prompts/*.txt from this file. Describe what the photos show; the image model is told not to idealise.",
+  "HEIGHT_CM": "175",
+  "BUILD": "average build, lightly athletic, not muscular",
+  "LIKENESS": "short dark brown hair, oval face, straight medium-brown eyebrows, brown eyes, straight nose, light stubble, medium skin tone",
+  "CLOTHES": "a fitted plain grey cotton crew-neck t-shirt with short sleeves, plain dark shorts ending just above the knee, low dark sneakers with dark soles and short dark ankle socks",
+  "ACCESSORIES": "No accessories.",
+  "COLLAR": "the collar of a plain grey cotton crew-neck t-shirt"
+}

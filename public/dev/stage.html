@@ -1,0 +1,243 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Stage test · World</title>
+<script type="importmap">{ "imports": {
+  "three": "/vendor/three/build/three.module.min.js",
+  "three/addons/": "/vendor/three/addons/" } }</script>
+<style>
+  html, body { margin: 0; height: 100%; background: #05070f; color: #f3ead8; font: 12px/1.35 ui-monospace, SFMono-Regular, Menlo, monospace; overflow: hidden; }
+  #stage { position: fixed; inset: 0; width: 100%; height: 100%; display: block; }
+  #panel { position: fixed; left: 8px; top: 8px; width: 286px; max-height: calc(100% - 16px); overflow: auto; padding: 8px 10px 10px;
+    background: rgba(6, 9, 20, .78); border: 1px solid rgba(212, 176, 106, .35); border-radius: 6px; backdrop-filter: blur(6px); }
+  #panel h4 { margin: 9px 0 4px; font-size: 10px; letter-spacing: .14em; text-transform: uppercase; color: #d4b06a; font-weight: 600; }
+  #panel h4:first-child { margin-top: 0; }
+  .row { display: flex; flex-wrap: wrap; gap: 4px; }
+  button { font: inherit; color: #f3ead8; background: rgba(95, 243, 224, .08); border: 1px solid rgba(95, 243, 224, .3); border-radius: 4px; padding: 4px 7px; cursor: pointer; }
+  button:active { background: rgba(95, 243, 224, .3); }
+  button.on { background: rgba(212, 176, 106, .28); border-color: #d4b06a; }
+  label { display: flex; align-items: center; gap: 6px; margin: 2px 0; }
+  label span { width: 54px; color: #9fb0c0; } label output { width: 34px; text-align: right; }
+  input[type=range] { flex: 1; accent-color: #5ff3e0; }
+  #stats { position: fixed; right: 8px; bottom: 8px; padding: 5px 8px; background: rgba(6, 9, 20, .7); border-radius: 4px; color: #9fe8dc; white-space: pre; pointer-events: none; }
+  #toggle { position: fixed; left: 8px; bottom: 8px; z-index: 3; }
+  #guides { position: fixed; inset: 0; pointer-events: none; display: none; }
+  #guides i { position: absolute; border: 1px dashed rgba(255, 120, 200, .7); background: rgba(255, 120, 200, .07); color: #ff9ad6; font-style: normal; padding: 4px; box-sizing: border-box; }
+  body.noui #panel, body.noui #stats, body.noui #toggle { display: none; }
+  #log { margin-top: 6px; color: #9fb0c0; min-height: 28px; white-space: pre-wrap; }
+</style>
+</head>
+<body>
+<canvas id="stage"></canvas>
+<div id="guides"></div>
+<div id="panel">
+  <h4>Mode</h4><div class="row" id="modes"></div>
+  <h4>Realm phase</h4><div class="row" id="phases"></div>
+  <label><span>altitude</span><input id="alt" type="range" min="-40" max="85" step="0.5" value="41"><output id="altO">41</output></label>
+  <label><span>azimuth</span><input id="az" type="range" min="0" max="360" step="1" value="88"><output id="azO">88</output></label>
+  <h4>Weather</h4><div class="row" id="weather"></div>
+  <h4>Character</h4><div class="row" id="chars"></div>
+  <h4>Vitals</h4>
+  <label><span>health</span><input id="health" type="range" min="0" max="100" value="82"><output id="healthO">82</output></label>
+  <label><span>energy</span><input id="energy" type="range" min="0" max="100" value="70"><output id="energyO">70</output></label>
+  <label><span>stamina</span><input id="stamina" type="range" min="0" max="100" value="60"><output id="staminaO">60</output></label>
+  <div class="row"><button id="vnull">all null (no signal)</button></div>
+  <h4>Pulse</h4><div class="row" id="pulses"></div>
+  <h4>Activity (world mode)</h4><div class="row" id="acts"></div>
+  <h4>Body</h4>
+  <label><span>weight</span><input id="bw" type="range" min="55" max="120" step="0.5" value="82"><output id="bwO">82</output></label>
+  <label><span>body fat</span><input id="bf" type="range" min="6" max="40" step="0.5" value="21"><output id="bfO">21</output></label>
+  <div class="row"><button id="ghost">goal ghost</button><button id="snapBtn">snapshots</button><button id="minfo">model info</button></div>
+  <div class="row" id="snaps" style="margin-top:6px"></div>
+  <h4>Realm</h4><div class="row" id="realms"></div>
+  <h4>Map focus</h4><div class="row" id="places"></div>
+  <h4>Quality</h4><div class="row" id="quality"></div>
+  <h4>Skin</h4><div class="row" id="skins"></div>
+  <h4>Tools</h4>
+  <div class="row">
+    <button id="amb">ambient</button><button id="ambNext">next ambient shot</button><button id="guidesBtn">UI guides</button><button id="lose">lose GL context</button><button id="recreate">dispose + recreate</button>
+    <button id="titleFast">title (settled)</button><button id="swap">re-create biome</button>
+  </div>
+  <div id="log"></div>
+</div>
+<button id="toggle">hide panel</button>
+<div id="stats">starting…</div>
+
+<script type="module">
+import { createStage } from "/app/stage.js";
+
+const q = new URLSearchParams(location.search);
+const $ = (id) => document.getElementById(id);
+const log = (...a) => { $("log").textContent = a.join(" "); console.log("[dev]", ...a); };
+if (q.get("ui") === "0") document.body.classList.add("noui");
+
+// Test data for this page only. The app never falls back to anything like this.
+const PHASES = {
+  dawn: { altitude: 2.0, azimuth: 106, phase: "dawn" },
+  day: { altitude: 41.2, azimuth: 88, phase: "day" },
+  noon: { altitude: 74, azimuth: 20, phase: "day" },
+  golden: { altitude: 6.5, azimuth: 252, phase: "golden" },
+  dusk: { altitude: -4.5, azimuth: 250, phase: "dusk" },
+  night: { altitude: -38, azimuth: 205, phase: "night" },
+};
+const WEATHER = { drizzle: [51, "Light drizzle"], clear: [0, "Clear sky"], partly: [2, "Partly cloudy"], overcast: [3, "Overcast"], fog: [45, "Fog"], rain: [63, "Rain"], storm: [95, "Thunderstorm"] };
+const ROSTER = [
+  { id: "gun", name: "Gun Hudson", playable: true, model: "/models/gun.glb", modelLite: "/models/gun-lite.glb" },
+  { id: "companion", kind: "ai", name: "Companion", playable: false },
+  { id: "sample-friend", kind: "person", name: "Sample friend", playable: false },
+  { id: "guild", kind: "guild", name: "Guild", playable: false },
+];
+// ?squad=<id>,<id>,...: party members with a body you supply (/models/<id>.glb, -lite.glb; none ship with the repo) for the squad shot; ?standins=1 shows the
+// unrevealed silhouette for members whose file is missing
+for (const id of (q.get("squad") || "").split(",").map((x) => x.trim()).filter(Boolean)) {
+  const e = ROSTER.find((r) => r.id === id) || (ROSTER.push({ id, name: id.replace(/-.*$/, "").replace(/^./, (c) => c.toUpperCase()), playable: false }), ROSTER[ROSTER.length - 1]);
+  e.model = `/models/${id}.glb`; e.modelLite = `/models/${id}-lite.glb`;
+}
+const WORLD = {
+  current: { name: "Marlow Cove", lat: -23.1, lon: -44.6 },
+  places: [
+    { name: "Port Hallam", lat: -33.6, lon: 19.4, kind: "city", visits: 4, first: "2013-09-14" },
+    { name: "Tanager", lat: 19.7, lon: -99.4, kind: "city", visits: 7, first: "2015-02-20" },
+    { name: "Sandline", lat: 27.3, lon: 78.4, kind: "city", visits: 2, first: "2016-11-03" },
+    { name: "Hanmoor", lat: 37.4, lon: 127.6, kind: "city", visits: 3, first: "2017-05-27" },
+    { name: "Silverton", lat: 52.3, lon: 20.7, kind: "city", visits: 5, first: "2018-08-09" },
+    { name: "Greyfell", lat: 53.4, lon: -7.8, kind: "city", visits: 2, first: "2019-03-30" },
+    { name: "Newhaven", lat: -41.2, lon: 173.1, kind: "city", visits: 1, first: "2020-02-11" },
+    { name: "Sunset Point", lat: 49.4, lon: -122.6, kind: "city", visits: 3, first: "2021-07-06" },
+    { name: "Cordoba Alta", lat: -13.4, lon: -72.2, kind: "city", visits: 2, first: "2022-10-18" },
+    { name: "Almera", lat: 9.6, lon: -83.9, kind: "city", visits: 4, first: "2023-04-22" },
+    { name: "Dunmere", lat: 30.6, lon: -9.1, kind: "city", visits: 6, first: "2024-01-13" },
+    { name: "Marlow Cove", lat: -23.1, lon: -44.6, kind: "home", visits: 17, first: "2021-12-05" },
+  ],
+  countries: 12, distanceKm: null,
+};
+const MODES = ["title", "select", "world", "sheet", "bags", "map", "treasury", "quests", "party", "needs", "squad"];
+
+const REALMS = { "tropical-coast": { place: "Marlow Cove", biome: "tropical-coast", lat: -23.1, lon: -44.6, tz: "Etc/GMT+3" }, "dry-coast": { place: "Dunmere", biome: "dry-coast", lat: 30.6, lon: -9.1, tz: "Etc/UTC" } };   // the key is the biome drawn (realm.biome); places and coordinates are made up
+const ACTS = ["idle", "walking", "training", "sleeping", "working", "eating", "celebrating"];
+const state = { realm: REALMS[q.get("realm")] ? q.get("realm") : "tropical-coast", act: q.get("act") || "idle", phase: q.get("phase") || "golden", weather: q.get("weather") || "partly", char: q.get("char") || "gun", mode: q.get("mode") || "title",
+  quality: q.get("q") || "auto", skin: q.get("skin") || "operative" };
+let stage = null;
+
+const realm = () => {
+  const sun = { ...PHASES[state.phase] };
+  if (state.custom) { sun.altitude = +$("alt").value; sun.azimuth = +$("az").value; sun.phase = sun.altitude < -6 ? "night" : sun.altitude < 0 ? (sun.azimuth < 180 ? "dawn" : "dusk") : sun.altitude < 10 ? (sun.azimuth < 180 ? "dawn" : "golden") : "day"; }
+  const [code, label] = WEATHER[state.weather];
+  return { ...REALMS[state.realm], sun, weather: { tempC: 30, humidity: 78, code, label } };
+};
+const body = () => ({ weightKg: +$("bw").value, bodyFatPct: +$("bf").value, goal: { weightKg: 78, bodyFatPct: 11, leanKg: 69.5 } });
+const vitals = () => state.vnull ? { health: null, energy: null, stamina: null } : { health: +$("health").value, energy: +$("energy").value, stamina: +$("stamina").value };
+
+function group(id, items, key, apply) {
+  const el = $(id);
+  for (const name of items) {
+    const b = document.createElement("button"); b.textContent = name; b.dataset.v = name;
+    b.onclick = () => { if (key) { state[key] = name; mark(id, name); } apply(name); };
+    el.append(b);
+  }
+  if (key) mark(id, state[key]);
+}
+function mark(id, v) { for (const b of $(id).children) b.classList.toggle("on", b.dataset.v === v); }
+
+async function boot() {
+  const t0 = performance.now();
+  // ?offline=1&quality=ultra: no render loop; scripts/cinematic/render.mjs drives frames with stage.step(dt).
+  // ?sun=<altitude>,<azimuth> overrides the phase's sun (the phase label is derived as the sliders do).
+  const offline = q.get("offline") === "1";
+  stage = await createStage($("stage"), { quality: q.get("quality") || state.quality, offline });
+  window.stage = stage;
+  if (q.get("sun")) { const [a, z] = q.get("sun").split(",").map(Number); $("alt").value = a; $("az").value = z; $("altO").value = a; $("azO").value = z; state.custom = true; }
+  stage.on("progress", (p) => { window.__progress = p; });
+  stage.on("pick", (e) => log("pick", JSON.stringify(e)));
+  stage.on("quality", (e) => { window.__quality = e; log("quality", JSON.stringify(e)); });
+  stage.on("contextlost", () => log("context lost"));
+  stage.on("contextrestored", () => log("context restored"));
+  stage.setSkin(state.skin);
+  stage.setRealm(realm());
+  stage.setRoster(ROSTER);
+  stage.setPlaces(WORLD);
+  stage.setCharacter(state.char);
+  stage.setVitals(vitals());
+  stage.setBody(q.get("bf") ? { weightKg: +(q.get("bw") || 80), bodyFatPct: +q.get("bf"), goal: { weightKg: 78, bodyFatPct: 11, leanKg: 69.5 } } : body());
+  stage.setActivity(state.act);
+  if (q.get("ghost") === "1") stage.setGhost(true);
+  if (q.get("outfit")) await stage.setOutfit(q.get("outfit"));         // ?outfit=grey-tank: a baked outfit texture set (outfits.sh)
+  const opts = {};
+  if (q.get("t") === "1") opts.instant = true;
+  if (q.get("dur")) opts.duration = +q.get("dur");
+  if (state.mode === "map" && q.get("focus")) { const [lat, lon] = q.get("focus").split(",").map(Number); opts.focus = { lat, lon }; }
+  if (q.get("standins") === "1") opts.standins = true;
+  window.__modeDone = false;
+  stage.setMode(state.mode, opts).then((v) => { window.__modeDone = true; log("mode", state.mode, "settled in", ((performance.now() - t0) / 1000).toFixed(1) + "s", String(v)); });
+  log("created in", Math.round(performance.now() - t0), "ms");
+  window.__ready = true;
+}
+
+group("modes", MODES, "mode", (m) => { const t = performance.now(); stage.setMode(m).then((v) => log("mode", m, "resolved", ((performance.now() - t) / 1000).toFixed(2) + "s", String(v))); });
+group("phases", Object.keys(PHASES), "phase", () => { state.custom = false; const s = PHASES[state.phase]; $("alt").value = s.altitude; $("az").value = s.azimuth; $("altO").value = s.altitude; $("azO").value = s.azimuth; stage.setRealm(realm()); });
+group("weather", Object.keys(WEATHER), "weather", () => stage.setRealm(realm()));
+group("chars", ROSTER.map((r) => r.id), "char", (id) => stage.setCharacter(id));
+group("pulses", ["xp", "level", "quest", "loot", "damage", "attribute", "streak"], null, (k) => stage.pulse(k));
+group("acts", ACTS, "act", (a) => { stage.setActivity(a); setTimeout(() => log("activity", a, "->", JSON.stringify(stage.getModelInfo().playing)), 400); });
+group("realms", Object.keys(REALMS), "realm", () => stage.setRealm(realm()));
+for (const id of ["bw", "bf"]) $(id).oninput = () => { $(id + "O").value = $(id).value; stage.setBody(body()); };
+let ghostOn = false;
+$("ghost").onclick = () => { ghostOn = !ghostOn; const ok = stage.setGhost(ghostOn); $("ghost").classList.toggle("on", ghostOn); log("ghost", ghostOn, "available:", ok); };
+$("minfo").onclick = () => log(JSON.stringify(stage.getModelInfo()));
+$("snapBtn").onclick = async () => {
+  const el = $("snaps"); el.replaceChildren();
+  for (const [id, framing] of [["gun", "portrait"], ["gun", "full"], ["companion", "portrait"], ["sample-friend", "portrait"], ["guild", "portrait"]]) {
+    const t = performance.now(); const url = await stage.snapshot(id, { size: 128, framing });
+    const im = new Image(); im.src = url; im.width = 64; im.title = `${id} ${framing} ${Math.round(performance.now() - t)} ms`; im.style.cssText = "background:repeating-conic-gradient(#333 0 25%,#222 0 50%) 0 0/12px 12px;border:1px solid #555"; el.append(im);
+  }
+};
+group("places", WORLD.places.map((p) => p.name), null, (n) => { const p = WORLD.places.find((x) => x.name === n); state.mode = "map"; mark("modes", "map"); stage.setMode("map", { focus: { lat: p.lat, lon: p.lon } }); });
+group("quality", ["low", "mid", "high", "auto"], "quality", (v) => stage.setQuality(v));
+group("skins", ["operative", "pandora", "azeroth"], "skin", (v) => stage.setSkin(v));
+for (const id of ["alt", "az"]) $(id).oninput = () => { $(id + "O").value = $(id).value; state.custom = true; mark("phases", "-"); stage.setRealm(realm()); };
+for (const id of ["health", "energy", "stamina"]) $(id).oninput = () => { $(id + "O").value = $(id).value; state.vnull = false; stage.setVitals(vitals()); };
+$("vnull").onclick = () => { state.vnull = true; stage.setVitals(vitals()); };
+$("toggle").onclick = () => { const p = $("panel"); p.style.display = p.style.display === "none" ? "" : "none"; $("toggle").textContent = p.style.display === "none" ? "show panel" : "hide panel"; };
+let ambOn = false;
+$("amb").onclick = () => { ambOn = !ambOn; $("amb").classList.toggle("on", ambOn); state.mode = "world"; mark("modes", "world"); stage.setMode("world", { ambient: ambOn, orbit: true }); };
+$("ambNext").onclick = () => { const d = stage._internal.director; d.amb.t = 60; };
+$("titleFast").onclick = () => { state.mode = "title"; mark("modes", "title"); stage.setMode("title", { instant: true }); };
+$("lose").onclick = () => {
+  const gl = $("stage").getContext("webgl2"); const ext = gl?.getExtension("WEBGL_lose_context");
+  if (!ext) return log("WEBGL_lose_context not available");
+  ext.loseContext(); setTimeout(() => ext.restoreContext(), 1500);
+};
+$("recreate").onclick = async () => { stage.dispose(); log("disposed"); await new Promise((r) => setTimeout(r, 300)); await boot(); };
+$("swap").onclick = () => { stage._internal.swapBiome(stage._internal.biomeDef, true); log("biome re-created"); };
+
+// where the DOM UI sits per mode (from docs/CLIENT.md), to check framing
+const GUIDES = {
+  title: [["centre title", 30, 38, 40, 24]],
+  select: [["roster", 67, 4, 31, 86], ["button", 38, 86, 24, 10]],
+  world: [["unit", 1, 1, 24, 16], ["minimap", 82, 1, 17, 26], ["quests", 80, 30, 19, 40], ["bar", 22, 88, 56, 11]],
+  sheet: [["slots", 2, 8, 26, 84], ["stats", 72, 8, 26, 84]],
+  bags: [["bags", 34, 5, 64, 90]],
+  map: [["places", 2, 6, 28, 88]],
+  treasury: [["panel", 20, 8, 60, 84]],
+};
+function drawGuides() {
+  const g = $("guides"); g.replaceChildren();
+  const list = GUIDES[state.mode] || GUIDES.treasury;
+  for (const [name, x, y, w, h] of list) { const i = document.createElement("i"); i.textContent = name; i.style.cssText = `left:${x}%;top:${y}%;width:${w}%;height:${h}%`; g.append(i); }
+}
+$("guidesBtn").onclick = () => { const g = $("guides"); g.style.display = g.style.display === "block" ? "none" : "block"; drawGuides(); };
+$("modes").addEventListener("click", () => setTimeout(drawGuides, 0));
+if (q.get("guides") === "1") { $("guides").style.display = "block"; drawGuides(); }
+
+setInterval(() => {
+  if (!stage?.getInfo) return;
+  const i = stage.getInfo();
+  $("stats").textContent = `${(i.fps || 0).toFixed(0)} fps · ${i.frameMs ? i.frameMs.toFixed(1) : "-"} ms (p95 ${i.p95 ? i.p95.toFixed(1) : "-"})\n${i.tier}${i.auto ? " (auto)" : ""} ×${i.scale} · ${i.render?.join("×")} · ${i.calls} calls · ${Math.round((i.triangles || 0) / 1000)}k tris\n${i.mode} · progress ${(window.__progress ?? 0).toFixed(2)}`;
+}, 500);
+
+boot().catch((e) => { log("boot failed: " + e.message); console.error(e); });
+</script>
+</body>
+</html>

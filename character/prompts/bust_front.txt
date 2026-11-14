@@ -1,0 +1,13 @@
+The attached photos all show the same real person. Produce a close-up FRONT VIEW HEAD-AND-SHOULDERS reference of them for 3D head modelling. Likeness is the whole point: it must look like THIS person, not a better-looking version of them.
+
+Framing: perfectly front-facing, symmetric, head straight and level (no tilt, no turn), eyes open looking straight at the camera, camera at eye height, long lens / orthographic feel with no perspective distortion (correct the wide-angle selfie distortion of the photos). The head fills most of the frame: the top of the head near the top margin, the image ends at the upper chest, both shoulders partly visible. Both ears fully visible.
+
+Keep the real face exactly as in the photos: {{LIKENESS}}. Expression: a relaxed closed-mouth smile (lips together, no teeth), cheeks slightly lifted.
+
+Do not slim, lengthen, sharpen or idealise the face. Do not change the eyebrows, nose or ears. Do not make them look like a model.
+
+Clothes: {{COLLAR}}.
+
+Rendering: clean, realistic game-character portrait (high-end real-time character art; natural skin, no heavy stylisation).
+
+Lighting and background: perfectly even, soft, shadowless frontal studio lighting (albedo-like, no rim light, no hard shadows, no specular hot spots on the scalp), flat solid light grey background (#c8c8c8). No text, no border, one head only.

@@ -1,0 +1,68 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no, viewport-fit=cover">
+<title>World</title>
+<meta name="description" content="A game client whose server is real life.">
+<meta name="theme-color" content="#050608">
+<meta name="color-scheme" content="dark">
+<meta name="mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<meta name="apple-mobile-web-app-title" content="World">
+<meta name="format-detection" content="telephone=no">
+<link rel="manifest" href="/img/manifest.webmanifest" crossorigin="use-credentials">
+<link rel="icon" href="/img/icon.svg" type="image/svg+xml">
+<link rel="icon" href="/img/icon-192.png" sizes="192x192" type="image/png">
+<link rel="apple-touch-icon" href="/img/apple-touch-icon.png">
+<script>
+  // Set before first paint: the overlay route is transparent, and the saved skin applies at once.
+  (function () {
+    var d = document.documentElement, q = location.search;
+    if (/[?&]overlay=1(&|$)/.test(q)) d.classList.add("overlay");
+    try {
+      var m = q.match(/[?&]skin=(operative|pandora|azeroth)/), s = m ? m[1] : localStorage.getItem("wog.skin");
+      if (s === "pandora" || s === "azeroth") d.setAttribute("data-skin", s);
+    } catch (e) {}
+  })();
+</script>
+<script>
+  // The world's own name (<meta name="wog-name">, written by the worker from WORLD_NAME) replaces the neutral default in
+  // the install title and in the web manifest. Without the tag nothing changes.
+  (function () {
+    try {
+      var m = document.querySelector('meta[name="wog-name"]'), name = m && (m.getAttribute("content") || "").trim();
+      if (!name) return;
+      document.title = name;
+      var at = document.querySelector('meta[name="apple-mobile-web-app-title"]'); if (at) at.setAttribute("content", name);
+      var link = document.querySelector('link[rel="manifest"]'); if (!link || !window.fetch || !window.URL || !URL.createObjectURL) return;
+      fetch(link.getAttribute("href"), { credentials: "same-origin" }).then(function (r) { return r.ok ? r.json() : null; }).then(function (j) {
+        if (!j) return; j.name = name; j.short_name = name.slice(0, 12);
+        j.start_url = location.origin + "/"; j.scope = location.origin + "/"; j.id = location.origin + "/";
+        j.icons = (j.icons || []).map(function (i) { return Object.assign({}, i, { src: new URL(i.src, location.origin).href }); });
+        link.setAttribute("href", URL.createObjectURL(new Blob([JSON.stringify(j)], { type: "application/manifest+json" })));
+      }).catch(function () {});
+    } catch (e) {}
+  })();
+</script>
+<script type="importmap">{ "imports": {
+  "three": "/vendor/three/build/three.module.min.js",
+  "three/addons/": "/vendor/three/addons/" } }</script>
+<link rel="stylesheet" href="/app/css/tokens.css">
+<link rel="stylesheet" href="/app/css/chrome.css">
+<link rel="stylesheet" href="/app/css/screens.css">
+<link rel="stylesheet" href="/app/css/hud.css">
+<link rel="stylesheet" href="/app/css/panels.css">
+<link rel="stylesheet" href="/app/css/mobile.css">
+<link rel="stylesheet" href="/app/css/round2.css">
+<link rel="stylesheet" href="/app/css/round3.css">
+<link rel="stylesheet" href="/app/css/round4.css">
+</head>
+<body>
+<canvas id="stage" aria-hidden="true"></canvas>
+<div id="ui"></div>
+<noscript><p style="position:fixed;inset:0;display:grid;place-items:center;color:#d4b06a;font:16px Didot,serif;letter-spacing:.2em">WORLD OF GUN NEEDS JAVASCRIPT</p></noscript>
+<script type="module" src="/app/main.js"></script>
+</body>
+</html>

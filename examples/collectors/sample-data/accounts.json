@@ -1,0 +1,10 @@
+{
+  "asOf": "2026-11-14",
+  "note": "Fictional balances in USD. Use an opaque id per account, never an account number.",
+  "accounts": [
+    { "id": "checking", "name": "Everyday checking", "kind": "cash", "value": 4200.5, "institution": "Example Bank" },
+    { "id": "savings", "name": "Savings", "kind": "cash", "value": 12000, "institution": "Example Bank" },
+    { "id": "wallet", "name": "Crypto wallet", "kind": "crypto", "value": 950.25, "institution": "Sample Wallet", "currency": "ETH", "native": 0.3 },
+    { "id": "card", "name": "Credit card", "kind": "debt", "value": 640, "institution": "Example Bank" }
+  ]
+}

@@ -1,0 +1,67 @@
+# World of Gun: one Cloudflare Worker with one Durable Object. Nothing else is needed: no KV, no
+# database, no other worker. Change the values marked <...>, then `wrangler deploy`.
+# Local play: copy .dev.vars.example to .dev.vars and run `wrangler dev`.
+
+name = "world-of-gun"                  # the worker's name on your account; rename it freely
+main = "src/index.js"
+compatibility_date = "2025-09-01"
+# By default the worker is served at https://<name>.<your-subdomain>.workers.dev.
+# For your own domain, add a route (the zone must be on your Cloudflare account):
+# routes = [{ pattern = "world.example.org", custom_domain = true }]
+
+# The client (three.js, models, textures) is static assets, served through the worker so that
+# every page and file sits behind the same sign-in (run_worker_first).
+[assets]
+directory = "./public"
+binding = "ASSETS"
+run_worker_first = true
+not_found_handling = "none"
+
+[vars]
+# ---- Who and what this world is. All optional; each has a neutral default.
+WORLD_NAME = "World of Gun"            # page title, and the name peer worlds see
+OWNER_NAME = "Player"                  # the character's name, until a profile.set event supplies one
+COMPANION_NAME = "Companion"           # the AI companion on the character select screen
+GUILD_NAME = "Guild"                   # the guild (a company, a team, a household): balances pushed with owner "guild"
+DEFAULT_SKIN = "operative"             # operative | pandora | azeroth: the skin a new browser starts with
+DEFAULT_BIOME = "tropical-coast"       # tropical-coast | dry-coast: the realm the stage draws
+
+# ---- Sign-in. The worker has no login page of its own: put Cloudflare Access (Zero Trust) in
+# front of it and name the Access application here. With both values empty, every page and
+# session route answers 401; `wrangler dev` with DEV=1 in .dev.vars is an owner session locally.
+ACCESS_TEAM = ""                       # the <team> in https://<team>.cloudflareaccess.com
+ACCESS_AUD = ""                        # the application's audience (AUD) tag: Access > Applications > your app > Overview
+OWNER_EMAIL = ""                       # <you@example.org>: the one address that owns this world; anyone else Access lets through gets 403
+
+# ---- Edge adapters (src/adapters.js): feeds the worker pulls for itself every five minutes.
+# Weather and air quality need no setup (open-meteo.com, no key; they start once a place is known).
+# NO_ADAPTERS = "1"                    # uncomment to switch every adapter off; pushed events still work
+# FLEET_STATUS_URL = "https://status.example.org/fleet.json"   # the example adapter: a status page of your own (shape: src/adapters.js)
+
+# Secrets: set each with `wrangler secret put <NAME>`, never in this file. All optional; a route
+# whose secret is not set refuses every key.
+#   INGEST_KEY        collectors push events and images with the header x-world-key (POST /api/ingest, /api/img/*)
+#   ACT_KEY           manual facts from voice, a keypad or a watch (POST /api/act, header x-act-key)
+#   TV_KEY            a read-only screen: the state document and model files (GET /api/tv, header x-tv-key)
+#   QC_INGEST_KEY, QC_ACT_KEY, QC_TV_KEY
+#                     the same three for the QC sandbox world; they must differ from the production keys
+#   FLEET_STATUS_KEY  sent as a Bearer token to FLEET_STATUS_URL, if that address needs one
+# Generate a key with: openssl rand -hex 32
+
+# The tick: every 5 minutes (edge adapters, then recompute). The World object also keeps its own
+# alarm; whichever fires first does the work, so a missed cron repairs itself.
+[triggers]
+crons = ["*/5 * * * *"]
+
+# The engine: event log + derived state (SQLite in a Durable Object). One object per world:
+# production, and one per QC sandbox name.
+[[durable_objects.bindings]]
+name = "WORLD"
+class_name = "World"
+
+[[migrations]]
+tag = "world-v1"
+new_sqlite_classes = ["World"]
+
+[observability]
+enabled = true

@@ -1,0 +1,22 @@
+{
+  "_": "Outfits for the 3D character (Lvl 3, 'dress me'). Each is a set of wardrobe items baked as a texture set public/tex/gun_body_<id>*.jpg by character/outfits.sh. Items marked assumed are guesses until the player confirms them.",
+  "outfits": [
+    { "id": "base", "name": "As modelled", "tex": null, "assumed": false,
+      "note": "The look the character was built in: plain black V-neck tee, black shorts, black sneakers.",
+      "items": [] },
+    { "id": "grey-tank", "name": "Grey tank and black shorts", "tex": "/tex/gun_body_grey-tank", "assumed": true,
+      "note": "A grey-blue heather tank with black shorts and blue trainers. Cap, headphones and watch are in the wardrobe but not on the body.",
+      "approx": "The tank is painted on the t-shirt cut: a faint sleeve line remains on the upper arms.",
+      "items": [{ "id": "photo-grey-blue-tank", "name": "Grey-blue heather tank" }, { "id": "photo-black-shorts", "name": "Black shorts" }, { "id": "photo-blue-trainers", "name": "Blue trainers" }],
+      "also": [{ "id": "photo-two-tone-cap", "name": "Cap" }, { "id": "photo-silver-headphones", "name": "Silver headphones" }, { "id": "photo-black-digital-watch", "name": "Black digital watch" }] },
+    { "id": "black-tank", "name": "Black tank and linen shorts", "tex": "/tex/gun_body_black-tank", "assumed": true,
+      "note": "A black sleeveless tank with white linen shorts and blue trainers.",
+      "approx": "The tank is painted on the t-shirt cut: a faint sleeve line remains on the upper arms.",
+      "items": [{ "id": "photo-black-tank", "name": "Black tank" }, { "id": "photo-white-linen-shorts", "name": "White linen shorts" }, { "id": "photo-blue-trainers", "name": "Blue trainers" }],
+      "also": [{ "id": "photo-silver-headphones", "name": "Silver headphones" }, { "id": "photo-black-digital-watch", "name": "Black digital watch" }] },
+    { "id": "tee-linen", "name": "Black tee and linen shorts", "tex": "/tex/gun_body_tee-linen", "assumed": true,
+      "note": "A black crew-neck tee with white linen shorts and blue trainers.",
+      "items": [{ "id": "photo-black-tee", "name": "Black crew-neck tee" }, { "id": "photo-white-linen-shorts", "name": "White linen shorts" }, { "id": "photo-blue-trainers", "name": "Blue trainers" }],
+      "also": [{ "id": "photo-white-earbuds", "name": "White earbuds" }] }
+  ]
+}

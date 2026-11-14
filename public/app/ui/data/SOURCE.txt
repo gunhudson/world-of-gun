@@ -1,0 +1,2 @@
+land-50m.json: world-atlas 2.0.2 (ISC, Mike Bostock), built from Natural Earth 1:50m land (public domain).
+TopoJSON, decoded in ui/minimap.js. Used for the minimap; no tiles or third-party map requests.

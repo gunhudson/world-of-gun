@@ -1,0 +1,199 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<title>Showcase render · World</title>
+<script type="importmap">{ "imports": {
+  "three": "/vendor/three/build/three.module.min.js",
+  "three/addons/": "/vendor/three/addons/" } }</script>
+<style>
+  html, body { margin: 0; height: 100%; background: #000; overflow: hidden; }
+  #stage { position: fixed; inset: 0; width: 100%; height: 100%; display: block; }
+  #out { position: fixed; left: 0; top: 0; width: 100%; height: 100%; display: block; pointer-events: none; }
+</style>
+</head>
+<body>
+<canvas id="stage"></canvas>
+<canvas id="out"></canvas>
+<script type="module">
+// Offline renderer page for the showcase film (scripts/cinematic/showcase.mjs). One shot per page load:
+//   window.show.setup(name)  -> builds the stage for that shot and settles it (fades done, clips blended)
+//   window.show.frame(dt)    -> advances the shot by dt, renders, composites the titles, returns a JPEG data URL
+// The stage runs in offline ultra mode (stage.step); titles are drawn here with the game's own display type (Didot,
+// tokens.css) on a 2D canvas over the WebGL frame, with the 2.39:1 letterbox the cold open uses.
+import { createStage } from "/app/stage.js";
+import { SHOTS, SUN, WEATHER } from "/dev/showcase-shots.js";
+
+const q = new URLSearchParams(location.search);
+const TALL = q.get("tall") === "1";        // the 9:16 version: top/bottom bands instead of the 2.39 letterbox, titles laid for the tall frame
+const $ = (id) => document.getElementById(id);
+const lerp = (a, b, k) => a + (b - a) * k, clamp = (v, a, b) => Math.max(a, Math.min(b, v));
+const smooth = (a, b, v) => { const k = clamp((v - a) / (b - a), 0, 1); return k * k * (3 - 2 * k); };
+
+// the dev page's test realm: a made-up coastal town in the tropical-coast biome, the shipped model, an invented places list for the globe
+const REALM = { place: "Marlow Cove", biome: "tropical-coast", lat: -23.1, lon: -44.6, tz: "Etc/GMT+3" };
+const ROSTER = [{ id: "gun", name: "Gun Hudson", playable: true, model: "/models/gun.glb" }];
+const WORLD = { current: { name: "Marlow Cove", lat: -23.1, lon: -44.6 }, countries: 12, distanceKm: null, places: [
+  { name: "Port Hallam", lat: -33.6, lon: 19.4, kind: "city", visits: 4, first: "2013-09-14" },
+  { name: "Tanager", lat: 19.7, lon: -99.4, kind: "city", visits: 7, first: "2015-02-20" },
+  { name: "Sandline", lat: 27.3, lon: 78.4, kind: "city", visits: 2, first: "2016-11-03" },
+  { name: "Hanmoor", lat: 37.4, lon: 127.6, kind: "city", visits: 3, first: "2017-05-27" },
+  { name: "Silverton", lat: 52.3, lon: 20.7, kind: "city", visits: 5, first: "2018-08-09" },
+  { name: "Greyfell", lat: 53.4, lon: -7.8, kind: "city", visits: 2, first: "2019-03-30" },
+  { name: "Newhaven", lat: -41.2, lon: 173.1, kind: "city", visits: 1, first: "2020-02-11" },
+  { name: "Sunset Point", lat: 49.4, lon: -122.6, kind: "city", visits: 3, first: "2021-07-06" },
+  { name: "Cordoba Alta", lat: -13.4, lon: -72.2, kind: "city", visits: 2, first: "2022-10-18" },
+  { name: "Almera", lat: 9.6, lon: -83.9, kind: "city", visits: 4, first: "2023-04-22" },
+  { name: "Dunmere", lat: 30.6, lon: -9.1, kind: "city", visits: 6, first: "2024-01-13" },
+  { name: "Marlow Cove", lat: -23.1, lon: -44.6, kind: "home", visits: 17, first: "2021-12-05" },
+] };
+
+const phaseOf = (alt, az) => alt < -6 ? "night" : alt < 0 ? (az < 180 ? "dawn" : "dusk") : alt < 10 ? (az < 180 ? "dawn" : "golden") : "day";
+const realmAt = (alt, az, weather) => { const [code, label] = WEATHER[weather] || WEATHER.partly; return { ...REALM, sun: { altitude: alt, azimuth: az, phase: phaseOf(alt, az) }, weather: { tempC: 29, humidity: 76, code, label } }; };
+const sunAt = (shot, k) => { const s = shot.sun; if (typeof s === "string") return SUN[s]; if (Array.isArray(s)) return s; return [lerp(s.from[0], s.to[0], k), lerp(s.from[1], s.to[1], k)]; };
+
+let stage = null, shot = null, tShot = 0, fired = new Set(), D = null, S = null;
+const glc = $("stage"), out = $("out"), g = out.getContext("2d", { alpha: false });
+let W = 0, H = 0;
+
+async function boot() {
+  stage = await createStage(glc, { quality: "ultra", offline: true });
+  window.stage = stage; S = stage._internal; D = S.director;
+  stage.on("progress", (p) => { window.__progress = p; });
+  window.__ready = true;
+}
+
+async function setup(name) {
+  shot = SHOTS.find((s) => s.name === name); if (!shot) throw new Error("no shot " + name);
+  tShot = 0; fired = new Set();
+  const dpr = window.devicePixelRatio || 1; W = Math.round(innerWidth * dpr); H = Math.round(innerHeight * dpr); out.width = W; out.height = H;
+  const [alt, az] = sunAt(shot, 0);
+  stage.setSkin("operative");
+  stage.setRealm(realmAt(alt, az, shot.weather));
+  stage.setRoster(ROSTER); stage.setPlaces(WORLD);
+  stage.setCharacter("gun");
+  stage.setVitals({ health: 86, energy: 72, stamina: 64 });
+  stage.setActivity(shot.act || "idle");
+  // the model: wait for it (progress reaches 1 once gun.glb is in)
+  const t0 = performance.now();
+  while (!(window.__progress >= 1) && performance.now() - t0 < 90000) await new Promise((r) => setTimeout(r, 100));
+  if (shot.cam) D.cine = (s, t, mode) => {
+    shot.cam(s, tShot, D, mode);
+    // tall frame: keep the landscape framing's width (a fraction of it) as the minimum horizontal field, so the subject stays whole
+    if (TALL) { const hf = (2 * Math.atan(Math.tan((s.fov * Math.PI) / 360) * 1.7778) * 180) / Math.PI; s.minH = Math.max(s.minH, hf * (shot.tallH ?? 0.72)); s.tgt.y += shot.tallDy ?? 0; }
+    return !!shot.freeFocus;
+  };
+  const opts = {};
+  if (shot.mode === "title") opts.instant = true;
+  if (shot.mode === "map" && shot.focus) opts.focus = shot.focus;
+  const done = stage.setMode(shot.mode || "world", opts);
+  // settle: the dip or fade-in must complete (the map mode's dip shows the globe in its mid callback), then clips blend
+  for (let i = 0; i < 60 && (D.fadeJob || D.fade < 0.999); i++) stage.step(0.05);
+  D.fade = 1; D.fadeJob = null;
+  if (shot.mode === "title") { D.title.dur = 1e9; D.title.u = shot.titleU ? shot.titleU[0] : 1; }
+  if (shot.mode === "map") { const gl = S.globe; gl.fly = null; gl.dist = gl.tDist = TALL ? 7.6 : 5.6; gl.idle = 999; }
+  for (let i = 0; i < (shot.warm ?? 36); i++) { dyn(0); stage.step(0.08); }
+  await Promise.race([done, new Promise((r) => setTimeout(r, 50))]);
+  return { tier: stage.getInfo().tier, render: stage.getInfo().render, mode: stage.getInfo().mode, model: stage.getModelInfo().standin ? "standin" : "glb" };
+}
+
+// per-frame dynamics at the shot clock: sun, fly-over progress, events
+function dyn(t) {
+  const k = clamp(t / shot.dur, 0, 1);
+  if (shot.sun && typeof shot.sun === "object" && !Array.isArray(shot.sun)) { const [alt, az] = sunAt(shot, k); stage.setRealm(realmAt(alt, az, shot.weather)); }
+  if (shot.mode === "title" && shot.titleU) D.title.u = lerp(shot.titleU[0], shot.titleU[1], k);
+  if (shot.mode === "map") { const gl = S.globe; gl.idle = 999; gl.tLon -= 0.06; }
+  for (const e of shot.at || []) if (t >= e.t && !fired.has(e)) { fired.add(e); e.do(stage, S); }
+}
+
+function frame(dt) {
+  tShot += dt; dyn(tShot);
+  stage.step(dt);
+  composite();
+  return out.toDataURL("image/jpeg", 0.94);
+}
+
+// ---- titles, in the game's type
+const GOLD = ["#fbefc8", "#d4b06a", "#8a6c36"], INK = "#f3ead8", ACCENT = "#d4b06a";
+const env = (t, from, d, inD = 0.9, outD = 0.9) => t < from || t > from + d ? 0 : Math.min(smooth(0, 1, (t - from) / inD), smooth(0, 1, (from + d - t) / outD));
+function goldFill(y0, y1) { const gr = g.createLinearGradient(0, y0, 0, y1); gr.addColorStop(0, GOLD[0]); gr.addColorStop(0.46, GOLD[1]); gr.addColorStop(1, GOLD[2]); return gr; }
+function text(str, x, y, px, { track = 0.2, fill = INK, alpha = 1, shadow = 0, upper = true, italic = false } = {}) {
+  g.save(); g.globalAlpha = alpha; g.font = `${italic ? "italic " : ""}400 ${px}px Didot, "Bodoni 72", "Hoefler Text", serif`;
+  g.textAlign = "center"; g.textBaseline = "alphabetic"; g.letterSpacing = `${track}em`;
+  if (shadow) { g.shadowColor = "rgba(0,0,0,0.75)"; g.shadowBlur = shadow; g.shadowOffsetY = shadow * 0.15; }
+  g.fillStyle = fill; g.fillText(upper ? str.toUpperCase() : str, x + (px * track) / 2, y);   // centre the tracked run
+  g.restore();
+}
+function composite() {
+  g.drawImage(glc, 0, 0, W, H);
+  const bar = TALL ? Math.round(H * 0.065) : Math.round((H * (1 - (W / H) / 2.39)) / 2);
+  if (bar > 0) { g.fillStyle = "#000"; g.fillRect(0, 0, W, bar); g.fillRect(0, H - bar, W, bar); }
+  const cy = H / 2, u = TALL ? W / 1080 : H / 1080;
+  for (const T of shot.titles || []) {
+    const a = env(tShot, T.t, T.d, 1.1, 1.0); if (a <= 0) continue;
+    const cx = W * (TALL ? 0.5 : (T.x ?? 0.5));
+    const rise = (1 - a) * 14 * u;
+    if (TALL) drawTall(T, a, cx, bar, u);
+    else if (T.name) {                                                     // the name card: "World of" / GUN / rule / line
+      const big = 212 * u;
+      text(T.over || "World of", cx, cy - big * 0.58 + rise, 27 * u, { track: 0.92, alpha: a, shadow: 12 * u });
+      text(T.name, cx, cy + big * 0.34 + rise, big, { track: 0.2, fill: goldFill(cy - big * 0.5, cy + big * 0.34), alpha: a, shadow: 30 * u });
+      if (T.rule) { const y = cy + big * 0.52 + rise, w = 150 * u; g.save(); g.globalAlpha = a;
+        const lg = g.createLinearGradient(cx - w - 14 * u, 0, cx - 14 * u, 0); lg.addColorStop(0, "rgba(212,176,106,0)"); lg.addColorStop(1, ACCENT); g.fillStyle = lg; g.fillRect(cx - w - 14 * u, y, w, Math.max(1, u));
+        const rg = g.createLinearGradient(cx + 14 * u, 0, cx + w + 14 * u, 0); rg.addColorStop(0, ACCENT); rg.addColorStop(1, "rgba(212,176,106,0)"); g.fillStyle = rg; g.fillRect(cx + 14 * u, y, w, Math.max(1, u));
+        g.translate(cx, y); g.rotate(Math.PI / 4); g.shadowColor = ACCENT; g.shadowBlur = 12 * u; g.fillStyle = ACCENT; g.fillRect(-3.5 * u, -3.5 * u, 7 * u, 7 * u); g.restore(); }
+      if (T.sub) text(T.sub, cx, cy + big * 0.52 + 44 * u + rise, 19 * u, { track: 0.42, fill: "rgba(243,234,216,0.8)", alpha: a, shadow: 10 * u });
+    } else if (T.small) {                                             // an activity word, low in the frame
+      const x = W * (T.x ?? 0.17), y = H - bar - 54 * u + rise;
+      text(T.text, x, y, 46 * u, { track: 0.3, fill: goldFill(y - 44 * u, y + 4 * u), alpha: a, shadow: 22 * u });
+      g.save(); g.globalAlpha = a * 0.9; g.fillStyle = ACCENT; g.fillRect(x - 60 * u, y + 16 * u, 120 * u, Math.max(1, u)); g.restore();
+    } else if (T.top) {                                               // a chapter held high in the frame, over a wide group (a corner when x is set)
+      let px = 84 * u; const y0 = bar + 118 * u;
+      if (T.x != null) { g.save(); g.font = `400 ${px}px Didot, "Bodoni 72", "Hoefler Text", serif`; g.letterSpacing = "0.18em"; const w = g.measureText(T.text.toUpperCase()).width; g.restore(); px *= Math.min(1, (W * 0.26) / w); }
+      if (T.kicker) text(T.kicker, cx, y0 - px * 0.55 + rise, 15 * u, { track: 0.5, fill: ACCENT, alpha: a, shadow: 10 * u });
+      text(T.text, cx, y0 + px * 0.3 + rise, px, { track: 0.18, fill: goldFill(y0 - px * 0.4, y0 + px * 0.3), alpha: a, shadow: 26 * u });
+    } else {                                                          // a chapter: kicker over a word; off-centre ones fit their half
+      let px = 118 * u;
+      if (T.x != null) { g.save(); g.font = `400 ${px}px Didot, "Bodoni 72", "Hoefler Text", serif`; g.letterSpacing = "0.18em"; const w = g.measureText(T.text.toUpperCase()).width; g.restore(); px *= Math.min(1, (W * 0.38) / w); }
+      if (T.kicker) text(T.kicker, cx, cy - px * 0.42 + rise, 15 * u, { track: 0.5, fill: ACCENT, alpha: a, shadow: 10 * u });
+      text(T.text, cx, cy + px * 0.3 + rise, px, { track: 0.18, fill: goldFill(cy - px * 0.4, cy + px * 0.3), alpha: a, shadow: 26 * u });
+    }
+  }
+  // the film's own fades (the director's fade is held at 1 while a shot renders)
+  fades();
+}
+// tall frame: the name card stays centred; chapter words and activity words sit in the upper third, fitted to the width
+function drawTall(T, a, cx, bar, u) {
+  const cy = H / 2, rise = (1 - a) * 14 * u;
+  const fit = (str, px, track, maxW) => { g.save(); g.font = `400 ${px}px Didot, "Bodoni 72", "Hoefler Text", serif`; g.letterSpacing = `${track}em`; const w = g.measureText(str.toUpperCase()).width; g.restore(); return px * Math.min(1, maxW / w); };
+  if (T.name) {
+    const big = fit(T.name, 212 * u, 0.2, W * 0.78);
+    text(T.over || "World of", cx, cy - big * 0.58 + rise, 27 * u, { track: 0.92, alpha: a, shadow: 12 * u });
+    text(T.name, cx, cy + big * 0.34 + rise, big, { track: 0.2, fill: goldFill(cy - big * 0.5, cy + big * 0.34), alpha: a, shadow: 30 * u });
+    if (T.rule) { const y = cy + big * 0.52 + rise, w = 120 * u; g.save(); g.globalAlpha = a;
+      const lg = g.createLinearGradient(cx - w - 14 * u, 0, cx - 14 * u, 0); lg.addColorStop(0, "rgba(212,176,106,0)"); lg.addColorStop(1, ACCENT); g.fillStyle = lg; g.fillRect(cx - w - 14 * u, y, w, Math.max(1, u));
+      const rg = g.createLinearGradient(cx + 14 * u, 0, cx + w + 14 * u, 0); rg.addColorStop(0, ACCENT); rg.addColorStop(1, "rgba(212,176,106,0)"); g.fillStyle = rg; g.fillRect(cx + 14 * u, y, w, Math.max(1, u));
+      g.translate(cx, y); g.rotate(Math.PI / 4); g.shadowColor = ACCENT; g.shadowBlur = 12 * u; g.fillStyle = ACCENT; g.fillRect(-3.5 * u, -3.5 * u, 7 * u, 7 * u); g.restore(); }
+    if (T.sub) text(T.sub, cx, cy + big * 0.52 + 44 * u + rise, 19 * u, { track: 0.42, fill: "rgba(243,234,216,0.8)", alpha: a, shadow: 10 * u });
+  } else if (T.small) {
+    const y = bar + 150 * u;
+    text(T.text, cx, y, 62 * u, { track: 0.3, fill: goldFill(y - 58 * u, y + 4 * u), alpha: a, shadow: 24 * u });
+    g.save(); g.globalAlpha = a * 0.9; g.fillStyle = ACCENT; g.fillRect(cx - 60 * u, y + 16 * u, 120 * u, Math.max(1, u)); g.restore();
+  } else {
+    const px = fit(T.text, 100 * u, 0.18, W * 0.86), y0 = bar + (T.top ? 150 : 250) * u;
+    if (T.kicker) text(T.kicker, cx, y0 - px * 0.5 + rise, 15 * u, { track: 0.5, fill: ACCENT, alpha: a, shadow: 10 * u });
+    text(T.text, cx, y0 + px * 0.3 + rise, px, { track: 0.18, fill: goldFill(y0 - px * 0.4, y0 + px * 0.3), alpha: a, shadow: 26 * u });
+  }
+}
+function fades() {
+  let black = 0;
+  if (shot.fadeIn) black = Math.max(black, 1 - smooth(0, shot.fadeIn, tShot));
+  if (shot.fadeOut) black = Math.max(black, smooth(shot.dur - shot.fadeOut, shot.dur, tShot));
+  if (black > 0) { g.fillStyle = `rgba(0,0,0,${black.toFixed(3)})`; g.fillRect(0, 0, W, H); }
+}
+
+window.show = { setup, frame, shots: () => SHOTS.map((s) => s.name), info: () => ({ t: tShot, shot: shot?.name }) };
+boot().catch((e) => { console.error(e); window.__bootError = String(e); });
+</script>
+</body>
+</html>

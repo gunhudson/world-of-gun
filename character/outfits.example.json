@@ -1,0 +1,9 @@
+{
+  "_comment": "Copy to outfits.json. One entry per look. 'refs' names photos in refs/cutouts/ (without .jpg): the real items, one photo each. 'clothes' is a list of what changes; describe the same cut as the base outfit if you want the baked texture to line up (README, Outfits).",
+  "linen-set": {
+    "refs_front": "Image 2 is a photo of the real shirt (white, short sleeves), image 3 the real shorts.",
+    "refs_other": "Image 3 is a photo of the real shorts.",
+    "clothes": "- Top: the base t-shirt becomes a plain white cotton crew-neck t-shirt with the same short sleeves, same fit and sleeve length; no print.\n- Shorts: relaxed sand-coloured linen shorts with a drawstring elastic waist, ending just above the knee, the same length as the current shorts.",
+    "refs": { "front": ["photo-white-shirt", "photo-sand-shorts"], "other": ["photo-sand-shorts"] }
+  }
+}

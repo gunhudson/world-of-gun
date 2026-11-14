@@ -1,0 +1,10 @@
+{
+  "note": "Written by hand (or by anything that knows where you are). The newest arrival is where the world puts you. tz is an IANA zone, country an ISO-2 code.",
+  "current": {
+    "place": "Old Harbour", "city": "Reykjavik", "country": "IS", "lat": 64.1466, "lon": -21.9426, "tz": "Atlantic/Reykjavik",
+    "kind": "city", "since": "2026-11-09", "confirmedAt": "2026-11-14T09:00:00Z"
+  },
+  "history": [
+    { "place": "Riverside flat", "city": "Wellington", "country": "NZ", "lat": -41.2866, "lon": 174.7756, "tz": "Pacific/Auckland", "kind": "home", "from": "2025-02-01", "to": "2026-11-08" }
+  ]
+}

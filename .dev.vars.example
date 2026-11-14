@@ -1,0 +1,21 @@
+# Local settings for `wrangler dev`. Copy this file to .dev.vars (which is git-ignored) and run:
+#   wrangler dev
+# Never put these values in wrangler.toml and never set DEV on a deployed worker.
+
+# DEV=1 makes every request an owner session (no Cloudflare Access needed on your own machine).
+# It also gives the ingest route two fixed local keys when INGEST_KEY / QC_INGEST_KEY are not set:
+#   x-world-key: dev      writes to the local production world
+#   x-world-key: qc-dev   writes to the local QC sandbox
+DEV=1
+
+# Optional: real keys for local testing of the machine routes (any string; see wrangler.toml).
+# INGEST_KEY=local-ingest-key
+# QC_INGEST_KEY=local-qc-ingest-key
+# ACT_KEY=local-act-key
+# QC_ACT_KEY=local-qc-act-key
+# TV_KEY=local-tv-key
+# QC_TV_KEY=local-qc-tv-key
+
+# Optional: the example adapter (src/adapters.js). Without it the companion has no status.
+# FLEET_STATUS_URL=https://status.example.org/fleet.json
+# FLEET_STATUS_KEY=local-status-key

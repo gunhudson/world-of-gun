@@ -1,0 +1,7 @@
+Image 1 is a 3D game character reference of a person standing in an A-pose. The other images are real photos of the same person and show their real build. Redraw image 1 keeping exactly the same pose, camera, framing, scale and position in the frame (head top and shoe soles at the same heights, arms at the same angle, wrists and feet in the same places), the same face, clothes, lighting and background, with two corrections.
+
+Correction 1, the real build. {{HEIGHT_CM}} cm tall, {{BUILD}}. Draw arms, shoulders, chest, waist, thighs and calves exactly as heavy or as slight as the photos show: no added muscle bulk, no visible veins, smooth skin, no V-taper unless the photos have one. Compare with the photos: the figure should look like the person in the photos wearing these clothes, not like an athlete.
+
+Correction 2, the hands. Both hands open and relaxed with all five fingers clearly separated from each other: a visible gap of grey background between every pair of neighbouring fingers, the thumb held away from the index finger, fingers nearly straight and pointing down and slightly outward, palms facing the thighs. Natural proportions, five fingers per hand.
+
+Everything else stays as in image 1: the face and hair, {{CLOTHES}}, {{ACCESSORIES}} perfectly even shadowless lighting, flat solid light grey background (#c8c8c8), a single figure, no text.

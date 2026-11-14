@@ -1,0 +1,77 @@
+{
+ "_comment": "PLACEHOLDER values. Copy to config.json and replace every pixel pick with a reading off your own sheet images (README, 'Landmarks'). Pixel y runs down; x runs right; all picks are in the pixels of the prepared sheet (work/prep/<name>.png). Nothing here describes a real person.",
+ "height_m": 1.75,
+ "body": {
+  "glb": "src/shapes/body.glb",
+  "front_image": "work/prep/body_front",
+  "back_image": "work/prep/body_back",
+  "head_top_y": 20,
+  "chin_y": 230,
+  "head_cx": 512,
+  "joints_px": {
+   "shoulder": [
+    [
+     345,
+     310
+    ],
+    [
+     679,
+     310
+    ]
+   ],
+   "elbow": [
+    [
+     260,
+     540
+    ],
+    [
+     764,
+     540
+    ]
+   ],
+   "wrist": [
+    [
+     190,
+     725
+    ],
+    [
+     834,
+     725
+    ]
+   ],
+   "hand_tip": [
+    [
+     155,
+     880
+    ],
+    [
+     869,
+     880
+    ]
+   ],
+   "knee_y": 1090,
+   "neck_y": 265,
+   "hips_y": 755
+  }
+ },
+ "bust": {
+  "glb": "src/shapes/bust.glb",
+  "front_image": "work/prep/bust_front",
+  "head_top_y": 20,
+  "chin_y": 780,
+  "head_cx": 512,
+  "skin_only": true,
+  "neck_reach_below_chin_m": 0.12
+ },
+ "neck_cut_below_chin_m": 0.018,
+ "voxel_m": 0.0022,
+ "tris": {
+  "head": 17000,
+  "hands": 7000,
+  "body": 32000
+ },
+ "rigid_hands": true,
+ "_notes": "bust.skin_only: head pictures texture skin only (their clothes are ignored). bust.neck_reach_below_chin_m: how far below the chin head pictures may texture skin (they do so only where the body pictures also show skin). rigid_hands: fingers follow the hand bone. neck_drop_m: the head sits this much lower on the body than the body sheet's chin landmark says (generated bodies often have a long neck). neck_thicken: radial scale on the lofted neck rings between the cut and the jaw line (1 = the bust's own neck). Optional keys read with defaults: sheets, views, cloth_wins, collar_rules, soft_collar, soft_collar_steps, head_own_below_chin_m, head_fallback_body, projectors, slim_base_m.",
+ "neck_drop_m": 0.02,
+ "neck_thicken": 1.0
+}

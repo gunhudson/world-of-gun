@@ -1,0 +1,9 @@
+# Daily body measurements. One row per day; leave a cell empty when nothing was measured (never 0).
+date,weight_kg,body_fat_pct,steps,sleep_hours,resting_hr
+2026-11-08,82.4,21.0,8120,7.1,62
+2026-11-09,82.2,,10544,6.4,63
+2026-11-10,82.0,20.8,6031,7.6,61
+2026-11-11,,,12877,7.9,60
+2026-11-12,81.7,20.6,9402,6.8,62
+2026-11-13,81.6,,11150,7.3,61
+2026-11-14,81.5,20.5,7788,7.0,61

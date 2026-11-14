@@ -1,0 +1,61 @@
+# dependencies and local tooling
+node_modules/
+.wrangler/
+.npm/
+
+# secrets and local configuration: never commit these
+.dev.vars
+.env
+.env.*
+*.key
+*-key
+*.pem
+.dev.vars.*
+!.dev.vars.example
+!.env.example
+
+# test and QC output
+qc/
+test-results/
+playwright-report/
+coverage/
+
+# render output (audio, cinematic frames) and scratch
+.render/
+tmp/
+*.log
+
+# character pipeline: working folders, source photos, painted sheets, local config
+character/work/
+character/refs/
+character/sheets/
+character/people/
+character/config.json
+character/appearance.json
+character/SPEND.md
+character/qc/
+character/src/shapes/
+# any image dropped in a character source folder
+character/refs/**
+*.heic
+*.HEIC
+
+# OS and editor files
+.DS_Store
+._*
+Thumbs.db
+.idea/
+.vscode/
+*.swp
+
+# Python caches and environments
+__pycache__/
+*.py[cod]
+.venv/
+venv/
+.pytest_cache/
+.ruff_cache/
+
+# character: generated prompts and per-user outfit definitions
+character/outfits.json
+character/prompts/outfits/
