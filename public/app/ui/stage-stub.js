@@ -98,7 +98,7 @@ export async function createStage(canvas, opts = {}) {
   }
 
   function frame() {
-    if (!alive) return;
+    if (!alive || document.hidden) { raf = 0; return; }
     raf = requestAnimationFrame(frame);
     for (const k of ["x", "s", "dim", "y", "globe"]) cam[k] += ((goal[k] ?? 0) - cam[k]) * 0.07;
     spin += 0.002;
@@ -140,7 +140,9 @@ export async function createStage(canvas, opts = {}) {
       }
     }
   }
-  raf = requestAnimationFrame(frame);
+  const onVis = () => { if (!document.hidden && alive && !raf) raf = requestAnimationFrame(frame); };
+  document.addEventListener("visibilitychange", onVis);
+  if (!document.hidden) raf = requestAnimationFrame(frame);
 
   // loading: report progress like a real stage would
   let p = 0;
@@ -162,7 +164,7 @@ export async function createStage(canvas, opts = {}) {
     squadAvailable() { return false; },
     on(ev, fn) { listeners[ev]?.add(fn); return () => listeners[ev]?.delete(fn); },
     resize, setQuality() {},
-    dispose() { alive = false; cancelAnimationFrame(raf); clearInterval(tick); window.removeEventListener("resize", onResize); },
+    dispose() { alive = false; cancelAnimationFrame(raf); clearInterval(tick); window.removeEventListener("resize", onResize); document.removeEventListener("visibilitychange", onVis); },
     get mode() { return mode; }, get vitals() { return vitals; }, quality: opts.quality || "auto",
   };
 }

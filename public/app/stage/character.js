@@ -386,6 +386,7 @@ export class CharacterStage {
     this.skinName = "operative";
     this.auraA = col(SKIN_AURA.operative.person[0]); this.auraB = col(SKIN_AURA.operative.person[1]);
     this.auraAT = this.auraA.clone(); this.auraBT = this.auraB.clone();
+    this._white = new THREE.Color(1, 1, 1); this._rimDay = new THREE.Color(); this._rimNight = new THREE.Color(); this._look = {};
     this.skin = null;
 
     this.silU = { rimCol: { value: col("#5ff3e0") }, rimP: { value: new THREE.Vector4(2.4, 2.2, 1, 900) }, flash: { value: new THREE.Color(0, 0, 0) } };
@@ -968,7 +969,7 @@ export class CharacterStage {
     }
     const sw = this.swap > 0 ? Math.sin(Math.PI * clamp(this.swap, 0, 1)) : 0;
     this.flashSprite.material.opacity = sw * 0.9;
-    this.flashSprite.material.color.copy(this.auraA).lerp(new THREE.Color(1, 1, 1), 0.5);
+    this.flashSprite.material.color.copy(this.auraA).lerp(this._white, 0.5);
     this.flashSprite.scale.setScalar(3 + sw * 3.5);
 
     this.energy = damp(this.energy, this.energyT, 1.5, dt);
@@ -1004,7 +1005,9 @@ export class CharacterStage {
       if (this.lieT >= 1) this.lieT = 0;
     }
     const act = this.props ? this.props.update(dt, t, { presence: isPerson ? p0 : null, energy: e }) : { key: 1, pool: 1, aura: 1, rim: 1, lamp: 1 };
-    look = { ...look, key: (look.key ?? 0.3) * act.key, pool: (look.pool ?? 1) * act.pool, aura: (look.aura ?? 1) * act.aura, rim: (look.rim ?? 1) * act.rim };
+    const lk = this._look;
+    lk.key = (look.key ?? 0.3) * act.key; lk.pool = (look.pool ?? 1) * act.pool; lk.aura = (look.aura ?? 1) * act.aura; lk.rim = (look.rim ?? 1) * act.rim; lk.ghost = look.ghost ?? 0;
+    look = lk;
     // body: ease the morph targets towards what the numbers say
     // (his numbers drive his model only: a party member's model carries the same morph names but not his body)
     if (isPerson && p0.morphNames?.length && this.currentId === "gun") {
@@ -1032,8 +1035,8 @@ export class CharacterStage {
     this.platform.update(t, { color: this.auraA, color2: this.auraB, power: auraPower, night: Math.max(night, 0.18), lamp: this.lampMul ?? 1, wet: atmo.wet || 0, pulse: this.pulse * (this.pulseK || 1) > 0 ? this.pulse : 0 });
 
     // silhouette rim: the accent colour, lifted towards the sky's colour by day
-    const rimDay = G.uSunHorizon.value.clone().lerp(new THREE.Color(1, 1, 1), 0.3).lerp(this.auraA, 0.45).multiplyScalar(1.7);
-    const rimNight = this.auraA.clone().multiplyScalar(1.55);
+    const rimDay = this._rimDay.copy(G.uSunHorizon.value).lerp(this._white, 0.3).lerp(this.auraA, 0.45).multiplyScalar(1.7);
+    const rimNight = this._rimNight.copy(this.auraA).multiplyScalar(1.55);
     const rim = rimDay.lerp(rimNight, clamp(night * 0.85 + 0.12, 0, 1));
     this.silU.rimCol.value.copy(rim);
     this.silU.rimP.value.set(lerp(2.8, 2.3, night), lerp(0.5, 1.0, e) * lerp(1.7, 2.8, night) * (look.rim ?? 1) * (1 + sw * 2), lerp(0.35, 1, e) * lerp(0.4, 1, night), viewportH);
@@ -1050,14 +1053,15 @@ export class CharacterStage {
     this.rim.position.set(Math.sin(ra) * 3.8, DAIS_TOP + 3.0, Math.cos(ra) * 3.8);
     this.key.intensity = (look.key ?? 0.3) * lerp(22, 44, dark) / Math.max(atmo.exposure, 1) * (standin ? 0.3 : 1);
     this.key.color.set("#fff2e0").lerp(G.uSunHorizon.value, 0.2 * (1 - dark));
-    this.rim.color.copy(rim).lerp(new THREE.Color(1, 1, 1), 0.25);
+    this.rim.color.copy(rim).lerp(this._white, 0.25);
     this.rim.intensity = lerp(26, 62, e) * (look.rim ?? 1) * lerp(1.0, 0.8, night) * (standin ? 0.5 : 1);
     this.glow.color.set("#fff0dc").lerp(this.auraA, 0.3);
     this.glow.intensity = (lerp(20, 64, dark) * (0.6 + 0.4 * auraPower) + this.pulse * 110) * (look.pool ?? 1);
 
     const H = this.presence?.height || 1.8, kind = this.presence?.kind || "person";
-    const cs = kind === "person" ? (this.lie ? [1.3, 2.7] : [1.7, 1.25]) : kind === "ai" ? [1.5, 1.5] : [3.2, 2.0];
-    this.contact.scale.set(cs[0], cs[1], 1); this.contact.rotation.z = this.slot.rotation.y;
+    const csX = kind === "person" ? (this.lie ? 1.3 : 1.7) : kind === "ai" ? 1.5 : 3.2;
+    const csY = kind === "person" ? (this.lie ? 2.7 : 1.25) : kind === "ai" ? 1.5 : 2.0;
+    this.contact.scale.set(csX, csY, 1); this.contact.rotation.z = this.slot.rotation.y;
     this.contact.material.opacity = (kind === "ai" ? 0.3 : 0.62) * (this.presence ? 1 : 0) * (this.swap > 0 && this.swap < 0.5 ? 1 - sw : 1);
     // aura: just behind the figure as seen from the camera
     const cl = Math.hypot(cx, cz) || 1;

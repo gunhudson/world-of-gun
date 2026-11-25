@@ -142,7 +142,7 @@ export function createTitle(app) {
 
   return {
     el, cineEl, cinematic,
-    enter() { on = true; paint(); el.classList.add("is-on", "hit"); clock = setInterval(paint, 15000); if (pending) { try { cineStart(pending); } catch (e) { console.warn("[cine]", e); cine = null; } } pending = null; arm(); },
+    enter() { on = true; paint(); el.classList.add("is-on", "hit"); clock = setInterval(() => { if (!document.hidden) paint(); }, 15000); if (pending) { try { cineStart(pending); } catch (e) { console.warn("[cine]", e); cine = null; } } pending = null; arm(); },
     leave() { on = false; clearTimeout(timer); clearInterval(clock); el.classList.remove("is-on", "hit"); cineStop(true); },
     update() { if (on) { paint(); if (!timer || !store.state) arm(); } },
     progress(p) { loaded = Math.max(loaded, p || 0); loadBar.style.transform = `scaleX(${loaded})`; if (loaded >= 1) el.classList.add("is-loaded"); },

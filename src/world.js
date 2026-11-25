@@ -225,14 +225,16 @@ export class World extends DurableObject {
     const partyIds = this.imageIds().filter(i => /^party-[a-z0-9][a-z0-9-]*$/.test(i) && !/-sm$/.test(i)).map(i => i.slice(6)).filter(id => idOk(id) && !partnerIds.includes(id)).slice(0, 24);
     const paths = [...[...ROSTER_IDS, ...partnerIds].flatMap(id => Object.values(rosterAssets(id))), ...partyIds.flatMap(id => { const a = rosterAssets(id); return [a.model, a.modelLite]; })];
     const run = (async () => {
-      const prev = new Set((cur && cur.present) || []);
-      const found = await Promise.all(paths.map(async p => {
-        try { const r = await this.env.ASSETS.fetch(new Request("https://assets.local" + p, { method: "HEAD" })); return r.status === 200 ? true : r.status === 404 ? false : prev.has(p); }
-        catch { return prev.has(p); }                       // could not ask: keep what was known
-      }));
-      const present = paths.filter((p, i) => found[i]);
-      if (!cur || JSON.stringify(cur.present) !== JSON.stringify(present)) this.mem.stale = true;
-      this.mem.assets = { at: Date.now(), present }; this.kvPut("assets", this.mem.assets); this.mem.assetsChecked = true; this.mem.assetsRun = null;
+      try {
+        const prev = new Set((cur && cur.present) || []);
+        const settled = await Promise.allSettled(paths.map(async p => {
+          const r = await this.env.ASSETS.fetch(new Request("https://assets.local" + p, { method: "HEAD" }));
+          return r.status === 200 ? true : r.status === 404 ? false : prev.has(p);
+        }));
+        const present = paths.filter((p, i) => settled[i].status === "fulfilled" ? settled[i].value : prev.has(p));
+        if (!cur || JSON.stringify(cur.present) !== JSON.stringify(present)) this.mem.stale = true;
+        this.mem.assets = { at: Date.now(), present }; this.kvPut("assets", this.mem.assets); this.mem.assetsChecked = true;
+      } finally { this.mem.assetsRun = null; }
     })();
     this.mem.assetsRun = run;
     if (!cur || !this.mem.assetsChecked) await run; else this.ctx.waitUntil(run);
@@ -428,8 +430,9 @@ export class World extends DurableObject {
       const f = this.loadFeeds()[a.id] || {};
       const tz = this.clockZone();
       const c = { now, tz, today: localDate(now, tz), meta: f.meta || null, snapshot: f.snapshot || null, place: this.currentPlace() };
+      let timer;
       try {
-        const out = await Promise.race([a.run(this.env, c), new Promise((_, rej) => setTimeout(() => rej(new Error("timed out after 25 s")), 25000))]);
+        const out = await Promise.race([a.run(this.env, c), new Promise((_, rej) => { timer = setTimeout(() => rej(new Error("timed out after 25 s")), 25000); })]);
         if (out.skip) { if (!out.keep) this.setFeed(a.id, { tryAt: now, note: out.note || f.note || null }); report[a.id] = out.keep ? "cached" : "skipped: " + (out.note || ""); return; }
         const list = [...(out.events || []), ...(out.voids || []).map(id => ({ id, type: id.split(":")[0], source: a.id, void: true }))];
         const { res } = this.write(list, now);
@@ -439,12 +442,12 @@ export class World extends DurableObject {
         // A failed run keeps the last good snapshot and meta, records why, and is tried again on the next tick.
         this.setFeed(a.id, { tryAt: now, error: String((err && err.message) || err).slice(0, 300), fails: (f.fails || 0) + 1 });
         report[a.id] = { ok: false, error: String((err && err.message) || err).slice(0, 300) };
-      }
+      } finally { clearTimeout(timer); }
     };
     // an adapter with the id "steps" (if you write one) runs first: its snapshot carries the device's time zone, which the others are given
     const first = due.find(a => a.id === "steps");
     if (first) await runOne(first);
-    await Promise.all(due.filter(a => a.id !== "steps").map(runOne));
+    await Promise.allSettled(due.filter(a => a.id !== "steps").map(runOne));
     const fresh = this.recompute(Date.now());
     this.broadcast(fresh);
     await this.armAlarm();
@@ -541,7 +544,8 @@ export class World extends DurableObject {
     let res, text;
     try {
       const h = await P.signRequest(inv.secret, inv.pair, "POST", path, helloBody, now);
-      res = await fetch(inv.url + path, { method: "POST", headers: { ...h, "Content-Type": "application/json" }, body: helloBody });
+      const sig = typeof AbortSignal !== "undefined" && AbortSignal.timeout ? AbortSignal.timeout(15_000) : undefined;
+      res = await fetch(inv.url + path, { method: "POST", headers: { ...h, "Content-Type": "application/json" }, body: helloBody, ...(sig ? { signal: sig } : {}) });
       text = await res.text();
     } catch (e) { return { ok: false, error: "could not reach the inviting world: " + String((e && e.message) || e).slice(0, 200) }; }
     if (res.status !== 200) return { ok: false, error: "the inviting world refused the hello (HTTP " + res.status + ")" };
@@ -591,11 +595,13 @@ export class World extends DurableObject {
     if (!s.enabled) return { ok: false, error: "peering is off for this world" };
     const rows = this.peerRows().filter(r => r.status === "active" && r.enabled && (!onlyId || r.id === onlyId));
     const events = [];
-    await Promise.all(rows.map(async r => {
+    await Promise.allSettled(rows.map(async r => {
       const path = P.peerPath("/api/peer/card", r.world || null);
+      let timer;
       try {
         const h = await P.signRequest(r.secret, r.id, "GET", path, "", Date.now());
-        const res = await Promise.race([fetch(r.url + path, { headers: h }), new Promise((_, rej) => setTimeout(() => rej(new Error("timed out after 15 s")), 15000))]);
+        const sig = typeof AbortSignal !== "undefined" && AbortSignal.timeout ? AbortSignal.timeout(15_000) : undefined;
+        const res = await Promise.race([fetch(r.url + path, { headers: h, ...(sig ? { signal: sig } : {}) }), new Promise((_, rej) => { timer = setTimeout(() => rej(new Error("timed out after 15 s")), 15000); })]);
         const text = await res.text();
         if (res.status !== 200) throw new Error("HTTP " + res.status);
         if (text.length > P.CARD_MAX_BYTES) throw new Error("card too large");
@@ -609,7 +615,7 @@ export class World extends DurableObject {
         const msg = String((e && e.message) || e).slice(0, 200);
         this.sql.exec("UPDATE peers SET last_pull = ?, last_error = ? WHERE id = ?", Date.now(), msg, r.id);
         report[r.id] = { ok: false, error: msg };
-      }
+      } finally { clearTimeout(timer); }
     }));
     const { res } = events.length ? this.write(events, now, { internal: true }) : { res: { changed: [] } };
     this.mem.stale = true;

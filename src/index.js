@@ -8,8 +8,18 @@ import { TOKEN_RE, TOKEN_SCOPE, tokenRoute } from "./tokens.js";
 import { PROD, QC, isQcWorld, askedWorld, decideWorld, tokenWorld, tokenPrefix } from "./worlds.js";
 import { uaFamily } from "./clientlog.js";
 import { accessConfigured, accessSession } from "./access.js";
+import { applySecurityHeaders, cacheControlFor, clientKey, etagMatches, jsonEtag, RateLimiter, readBoundedBytes, readBoundedText, safeDecode } from "./http.js";
 
 const J = (obj, status = 200, extra) => new Response(JSON.stringify(obj), { status, headers: { "Content-Type": "application/json; charset=utf-8", "Cache-Control": "no-store", ...(extra || {}) } });
+const authLimiter = new RateLimiter({ windowMs: 60_000, maxKeys: 512 });
+const writeLimiter = new RateLimiter({ windowMs: 60_000, maxKeys: 512 });
+const AUTH_FAIL_LIMIT = 30;
+const WRITE_LIMIT = 120;
+const MAX_INGEST_BYTES = 5_000_000;
+const MAX_IMG_BYTES = 1_600_000;
+const MAX_SMALL_JSON_BYTES = 64_000;
+let rulesCache = null;
+export const _resetWorkerState = () => { authLimiter.clear(); writeLimiter.clear(); rulesCache = null; };
 
 // Where the owner's session comes from: the Cloudflare Access token in front of the worker (vars ACCESS_TEAM + ACCESS_AUD,
 // src/access.js), or DEV=1 in .dev.vars for local play. Nothing else makes a session: with neither, every page and
@@ -64,6 +74,7 @@ const qcPageTag = w => `<div id="qc-world-tag" data-world="${w}" role="status" s
 // A world names and styles itself from its vars: WORLD_NAME is the page title and the peering display name, DEFAULT_SKIN the
 // skin a fresh browser starts with, DEFAULT_BIOME the realm the stage draws.
 function stylePage(res, env) {
+  if (res.status !== 200) return res;
   const name = typeof env.WORLD_NAME === "string" && env.WORLD_NAME.trim() ? env.WORLD_NAME.trim().slice(0, 60) : null;
   const skin = typeof env.DEFAULT_SKIN === "string" && /^[a-z]{2,20}$/.test(env.DEFAULT_SKIN) ? env.DEFAULT_SKIN : null;
   const biome = typeof env.DEFAULT_BIOME === "string" && /^[a-z][a-z-]{1,24}$/.test(env.DEFAULT_BIOME) ? env.DEFAULT_BIOME : null;
@@ -75,7 +86,7 @@ function stylePage(res, env) {
   return rw.transform(res);
 }
 function qcPage(res, w) {
-  if (!/text\/html/.test(res.headers.get("Content-Type") || "")) return res;
+  if (res.status !== 200 || !/text\/html/.test(res.headers.get("Content-Type") || "")) return res;
   return new HTMLRewriter()
     .on("html", { element(e) { e.setAttribute("data-world", w); } })
     .on("head", { element(e) { e.prepend(`<meta name="wog-world" content="${w}"><script>${qcPageScript(w)}</script>`, { html: true }); } })
@@ -85,7 +96,18 @@ function qcPage(res, w) {
 
 async function handle(request, env, ctx, rq) {
   const url = new URL(request.url), p = url.pathname, method = request.method;
-  if (p === "/healthz") return new Response("ok");
+  if (p === "/healthz") return new Response("ok", { headers: { "Content-Type": "text/plain; charset=utf-8", "Cache-Control": "no-store" } });
+  const ip = clientKey(request);
+  const tooMany = sec => J({ error: "too many requests" }, 429, { "Retry-After": String(sec) });
+  const checkAuthBlock = scope => { const b = authLimiter.blocked(ip + ":" + scope, AUTH_FAIL_LIMIT); return b.blocked ? tooMany(b.retryAfterSec) : null; };
+  const authFail = (scope, msg) => { authLimiter.take(ip + ":" + scope, AUTH_FAIL_LIMIT); return J({ error: msg }, 401); };
+  const checkWriteRate = bucket => { const r = writeLimiter.take(ip + ":" + bucket, WRITE_LIMIT); return r.ok ? null : tooMany(r.retryAfterSec); };
+  const readJson = async (maxBytes, errMsg, allowEmpty = false) => {
+    const r = await readBoundedText(request, maxBytes);
+    if (!r.ok) return { err: J({ error: r.error }, r.status) };
+    if (allowEmpty && !r.text.trim()) return { data: {} };
+    try { return { data: JSON.parse(r.text) }; } catch { return { err: J({ error: errMsg }, 400) }; }
+  };
   const asked = askedWorld(url.searchParams.get("world"), request.headers.get("x-world"));
   /** Settle the world for this request from its credential and the explicit marker. -> stub, or a Response refusing it. */
   const enter = async credWorld => {
@@ -99,27 +121,36 @@ async function handle(request, env, ctx, rq) {
   // ---- machines: collectors push events and images with the ingest key
   if (p === "/api/ingest") {
     if (method !== "POST") return J({ error: "POST required" }, 405);
-    const kw = await ingestWorld(request, env); if (!kw) return J({ error: "bad or missing x-world-key" }, 401);
+    const blk = checkAuthBlock("ingest"); if (blk) return blk;
+    const kw = await ingestWorld(request, env); if (!kw) return authFail("ingest", "bad or missing x-world-key");
     const W = await enter(kw); if (refused(W)) return W;
-    let body; try { body = await request.json(); } catch { return J({ error: "body must be JSON: { events: [...] }" }, 400); }
+    const { data: body, err } = await readJson(MAX_INGEST_BYTES, "body must be JSON: { events: [...] }");
+    if (err) return err;
     const out = await W.ingest(Array.isArray(body) ? body : body && body.events);
     return J(out, out.ok ? 200 : 400);
   }
   if (p.startsWith("/api/img/") && (method === "POST" || method === "PUT")) {
-    const kw = await ingestWorld(request, env); if (!kw) return J({ error: "bad or missing x-world-key" }, 401);
+    const blk = checkAuthBlock("ingest"); if (blk) return blk;
+    const kw = await ingestWorld(request, env); if (!kw) return authFail("ingest", "bad or missing x-world-key");
     const W = await enter(kw); if (refused(W)) return W;
-    const out = await W.putImage(decodeURIComponent(p.slice(9)), (request.headers.get("Content-Type") || "").split(";")[0].trim(), await request.arrayBuffer());
+    const imgId = safeDecode(p.slice(9)); if (imgId == null) return J({ error: "malformed image id" }, 400);
+    const body = await readBoundedBytes(request, MAX_IMG_BYTES);
+    if (!body.ok) return J({ error: "image over limit" }, 413);
+    const out = await W.putImage(imgId, (request.headers.get("Content-Type") || "").split(";")[0].trim(), body.bytes.buffer);
     return J(out, out.ok ? 200 : 400);
   }
   if (p.startsWith("/api/img/") && method === "DELETE") {
-    const kw = await ingestWorld(request, env); if (!kw) return J({ error: "bad or missing x-world-key" }, 401);
+    const blk = checkAuthBlock("ingest"); if (blk) return blk;
+    const kw = await ingestWorld(request, env); if (!kw) return authFail("ingest", "bad or missing x-world-key");
     const W = await enter(kw); if (refused(W)) return W;
-    return J(await W.deleteImage(decodeURIComponent(p.slice(9))));
+    const imgId = safeDecode(p.slice(9)); if (imgId == null) return J({ error: "malformed image id" }, 400);
+    return J(await W.deleteImage(imgId));
   }
   // ---- raw events by source (ingest key): verify a history, find test traffic, then void it through /api/ingest
   if (p === "/api/events") {
     if (method !== "GET") return J({ error: "GET required" }, 405);
-    const kw = await ingestWorld(request, env); if (!kw) return J({ error: "bad or missing x-world-key" }, 401);
+    const blk = checkAuthBlock("ingest"); if (blk) return blk;
+    const kw = await ingestWorld(request, env); if (!kw) return authFail("ingest", "bad or missing x-world-key");
     const W = await enter(kw); if (refused(W)) return W;
     const since = url.searchParams.get("since"), t = since ? Date.parse(since) : 0;
     if (since && !Number.isFinite(t)) return J({ error: "since is not a time" }, 400);
@@ -128,7 +159,8 @@ async function handle(request, env, ctx, rq) {
   }
   if (p.startsWith("/api/admin/")) {
     if (method !== "POST") return J({ error: "POST required" }, 405);
-    const kw = await ingestWorld(request, env); if (!kw) return J({ error: "bad or missing x-world-key" }, 401);
+    const blk = checkAuthBlock("ingest"); if (blk) return blk;
+    const kw = await ingestWorld(request, env); if (!kw) return authFail("ingest", "bad or missing x-world-key");
     if (p.startsWith("/api/admin/qc/")) {                  // sandbox maintenance: the QC ingest key, and only that; the marker picks which QC world
       if (kw !== QC) return J({ error: "this route exists only in the QC world: use the QC ingest key" }, 401);
       const W = await enter(QC); if (refused(W)) return W;
@@ -149,16 +181,19 @@ async function handle(request, env, ctx, rq) {
   // ---- manual facts from voice / keypad / watch: ACT key, or the owner's session (same-origin only)
   if (p === "/api/act") {
     if (method !== "POST") return J({ error: "POST required" }, 405);
+    const blk = checkAuthBlock("act"); if (blk) return blk;
     const kw = await actWorld(request, env);
     if (!kw) {
       const sess = await getSession(request, env);
-      if (!sess || sess.role !== "owner") return J({ error: "x-act-key or an owner session is required" }, 401);
+      if (!sess || sess.role !== "owner") return authFail("act", "x-act-key or an owner session is required");
       const origin = request.headers.get("Origin");
       if (origin && origin !== url.origin) return J({ error: "cross-origin writes denied" }, 403);
     }
+    const wr = checkWriteRate("act"); if (wr) return wr;
     const W = await enter(kw); if (refused(W)) return W;
     if (!/^application\/json/.test(request.headers.get("Content-Type") || "")) return J({ error: "Content-Type must be application/json" }, 415);
-    let body; try { body = await request.json(); } catch { return J({ error: "body must be JSON" }, 400); }
+    const { data: body, err } = await readJson(MAX_SMALL_JSON_BYTES, "body must be JSON");
+    if (err) return err;
     const out = await W.act(body, (body && body.channel) || (kw ? "voice" : "web"));
     return J(out, out.ok ? 200 : 400);
   }
@@ -173,8 +208,8 @@ async function handle(request, env, ctx, rq) {
     if (origin && origin !== url.origin) return J({ error: "cross-origin writes denied" }, 403);
     const W = await enter(null); if (refused(W)) return W;
     if (!/^application\/json/.test(request.headers.get("Content-Type") || "")) return J({ error: "Content-Type must be application/json" }, 415);
-    if (Number(request.headers.get("Content-Length") || 0) > 2_000_000) return J({ error: "body over 2 MB" }, 413);
-    let body; try { body = await request.json(); } catch { return J({ error: "body must be JSON: { deviceId, events: [...] }" }, 400); }
+    const { data: body, err } = await readJson(2_000_000, "body must be JSON: { deviceId, events: [...] }");
+    if (err) return err;
     const out = await W.phone(body);
     return J(out, out.ok ? 200 : 400);
   }
@@ -188,7 +223,9 @@ async function handle(request, env, ctx, rq) {
     const origin = request.headers.get("Origin");
     if (origin && origin !== url.origin) return J({ error: "cross-origin writes denied" }, 403);
     const W = await enter(null); if (refused(W)) return W;
-    let body = {}; try { body = await request.json(); } catch { body = {}; }
+    const r = await readBoundedText(request, MAX_SMALL_JSON_BYTES);
+    if (!r.ok) return J({ error: r.error }, r.status);
+    let body = {}; try { body = r.text ? JSON.parse(r.text) : {}; } catch { body = {}; }
     const out = await W.markSeen(body && body.date, !(body && body.seen === false));
     return J(out, out.ok ? 200 : 400);
   }
@@ -203,16 +240,17 @@ async function handle(request, env, ctx, rq) {
       if (origin && origin !== url.origin) return J({ error: "cross-origin writes denied" }, 403);
       const W = await enter(null); if (refused(W)) return W;
       const done = new Response(null, { status: 204, headers: { "Cache-Control": "no-store" } });
-      let text = ""; try { text = Number(request.headers.get("Content-Length") || 0) > 100_000 ? "" : await request.text(); } catch { text = ""; }
-      if (!text || text.length > 100_000) return done;
+      let text = ""; try { const r = await readBoundedText(request, 100_000); text = r.ok ? r.text : ""; } catch { text = ""; }
+      if (!text) return done;
       let body; try { body = JSON.parse(text); } catch { return done; }
       const meta = { sess: (await sha256hex(sess.sid || "")).slice(0, 16), device: uaFamily(request.headers.get("User-Agent")), colo: (request.cf && request.cf.colo) || null };
       ctx.waitUntil(Promise.resolve().then(() => W.clientLogPut(body, meta)).catch(() => {}));       // stored after the reply: the page never waits on it
       return done;
     }
     if (method === "GET") {
+      const blk = checkAuthBlock("clientlog"); if (blk) return blk;
       const kw = (await ingestWorld(request, env)) || (await tvWorldOf(request, env, url));
-      if (!kw) return J({ error: "the ingest key (x-world-key) or the TV key (x-tv-key) is required" }, 401);
+      if (!kw) return authFail("clientlog", "the ingest key (x-world-key) or the TV key (x-tv-key) is required");
       const W = await enter(kw); if (refused(W)) return W;
       const since = url.searchParams.get("since"), t = since ? Date.parse(since) : 0;
       if (since && !Number.isFinite(t)) return J({ error: "since is not a time" }, 400);
@@ -227,8 +265,9 @@ async function handle(request, env, ctx, rq) {
   if (p === "/api/peer/hello" || p === "/api/peer/card") {
     const route = p.slice("/api/peer/".length);
     if ((route === "hello" && method !== "POST") || (route === "card" && method !== "GET")) return J({ error: "not found" }, 404);
+    const wr = checkWriteRate("peer"); if (wr) return wr;
     const W = await enter(null); if (refused(W)) return W;
-    let text = ""; try { text = Number(request.headers.get("Content-Length") || 0) > 20_000 ? null : await request.text(); } catch { text = null; }
+    let text = ""; try { const r = await readBoundedText(request, 20_000); text = r.ok ? r.text : null; } catch { text = null; }
     if (text === null) return J({ error: "unauthorized" }, 401);
     const hdr = {}; for (const n of ["x-peer-id", "x-peer-ts", "x-peer-nonce", "x-peer-sig"]) hdr[n] = request.headers.get(n) || "";
     const r = await W.peerRequest({ method, route, path: url.pathname + url.search, headers: hdr, body: text });
@@ -236,19 +275,19 @@ async function handle(request, env, ctx, rq) {
   }
 
   // ---- a read-only screen (a TV app, a wall display): same state document, key-gated (the key decides the world)
-  const tvWorld = await tvWorldOf(request, env, url), tvOk = !!tvWorld;
-  if (p === "/api/tv") {
-    if (!tvOk) return J({ error: "bad or missing key" }, 401);
-    const W = await enter(tvWorld); if (refused(W)) return W;
-    return J(await W.getState());
-  }
-  // Model files for a native screen (read-only): GET /api/tv/model/<file>.usdz|.glb serves public/models/<file>
-  // to the TV key, so a new export of the character reaches the app without an app release.
-  if (p.startsWith("/api/tv/model/")) {
-    if (!tvOk) return J({ error: "bad or missing key" }, 401);
+  if (p === "/api/tv" || p.startsWith("/api/tv/model/")) {
+    const blk = checkAuthBlock("tv"); if (blk) return blk;
+    const tvWorld = await tvWorldOf(request, env, url);
+    if (!tvWorld) return authFail("tv", "bad or missing key");
+    if (p === "/api/tv") {
+      const W = await enter(tvWorld); if (refused(W)) return W;
+      return J(await W.getState());
+    }
+    // Model files for a native screen (read-only): GET /api/tv/model/<file>.usdz|.glb serves public/models/<file>
+    // to the TV key, so a new export of the character reaches the app without an app release.
     if (method !== "GET" && method !== "HEAD") return J({ error: "GET required" }, 405);
-    const name = decodeURIComponent(p.slice("/api/tv/model/".length));
-    if (!/^[a-z0-9][a-z0-9_-]*\.(usdz|glb)$/i.test(name)) return J({ error: "not found" }, 404);
+    const name = safeDecode(p.slice("/api/tv/model/".length));
+    if (!name || !/^[a-z0-9][a-z0-9_-]*\.(usdz|glb)$/i.test(name)) return J({ error: "not found" }, 404);
     const h = new Headers();
     const inm = request.headers.get("If-None-Match"); if (inm) h.set("If-None-Match", inm);
     const r = await env.ASSETS.fetch(new Request(new URL("/models/" + name, url.origin), { method, headers: h }));
@@ -256,8 +295,9 @@ async function handle(request, env, ctx, rq) {
     const out = new Headers(r.headers);
     out.set("Cache-Control", "private, no-cache");
     if (name.toLowerCase().endsWith(".usdz")) out.set("Content-Type", "model/vnd.usdz+zip");
-    return new Response(r.body, { status: r.status, headers: out });
+    return new Response(r.status === 304 ? null : r.body, { status: r.status, headers: out });
   }
+  const tvWorld = await tvWorldOf(request, env, url), tvOk = !!tvWorld;
 
   // ---- people: the owner's session
   const session = await getSession(request, env);
@@ -270,8 +310,11 @@ async function handle(request, env, ctx, rq) {
     if (origin && origin !== url.origin) return J({ error: "cross-origin requests denied" }, 403);
     if (method === "POST") {
       if (!owner) return J({ error: session ? "forbidden" : signInHint(env) }, session ? 403 : 401);
+      const wr = checkWriteRate("token"); if (wr) return wr;
       const W = await enter(null); if (refused(W)) return W;
-      let body = {}; try { body = await request.json(); } catch { body = {}; }
+      const r0 = await readBoundedText(request, MAX_SMALL_JSON_BYTES);
+      if (!r0.ok) return J({ error: r0.error }, r0.status);
+      let body = {}; try { body = r0.text ? JSON.parse(r0.text) : {}; } catch { body = {}; }
       const label = body && typeof body.label === "string" ? body.label.trim().slice(0, 60) : null;
       const token = tokenPrefix(rq.world) + [...crypto.getRandomValues(new Uint8Array(32))].map(x => x.toString(16).padStart(2, "0")).join("");
       const r = await W.mintToken(await sha256hex(token), session.sid, label, Date.now());
@@ -284,10 +327,13 @@ async function handle(request, env, ctx, rq) {
     }
     if (method === "DELETE") {
       const t = bearerOf(request);
-      if (TOKEN_RE.test(t)) { const W = await enter({ exact: tokenWorld(t) }); if (refused(W)) return W; return J(await W.revokeTokens({ hash: await sha256hex(t) })); }   // a token may always revoke itself
+      if (TOKEN_RE.test(t)) { const wr = checkWriteRate("token"); if (wr) return wr; const W = await enter({ exact: tokenWorld(t) }); if (refused(W)) return W; return J(await W.revokeTokens({ hash: await sha256hex(t) })); }   // a token may always revoke itself
       if (!owner) return J({ error: "a read token (Authorization: Bearer) or an owner session is required" }, 401);
+      const wr = checkWriteRate("token"); if (wr) return wr;
       const W = await enter(null); if (refused(W)) return W;
-      let body = {}; try { body = await request.json(); } catch { body = {}; }
+      const r0 = await readBoundedText(request, MAX_SMALL_JSON_BYTES);
+      if (!r0.ok) return J({ error: r0.error }, r0.status);
+      let body = {}; try { body = r0.text ? JSON.parse(r0.text) : {}; } catch { body = {}; }
       if (body && typeof body.token === "string" && TOKEN_RE.test(body.token)) return J(await W.revokeTokens({ hash: await sha256hex(body.token) }));
       if (body && typeof body.id === "string") return J(await W.revokeTokens({ id: body.id }));
       if (body && body.all === true) return J(await W.revokeTokens({ all: true }));
@@ -302,23 +348,27 @@ async function handle(request, env, ctx, rq) {
     const origin = request.headers.get("Origin");
     if (method !== "GET" && origin && origin !== url.origin) return J({ error: "cross-origin writes denied" }, 403);
     const W = await enter(null); if (refused(W)) return W;
-    const readBody = async () => { try { return await request.json(); } catch { return {}; } };
+    const readBody = async () => {
+      const r = await readBoundedText(request, MAX_SMALL_JSON_BYTES);
+      if (!r.ok) return { err: J({ error: r.error }, r.status) };
+      try { return { data: r.text ? JSON.parse(r.text) : {} }; } catch { return { data: {} }; }
+    };
     const reply = out => J(out, out.ok ? 200 : 400);
     if (p === "/api/share") {
       if (method === "GET") return J({ ok: true, ...(await W.peerList()) });
-      if (method === "PUT" || method === "POST") return reply(await W.peeringSet(await readBody()));
+      if (method === "PUT" || method === "POST") { const { data, err } = await readBody(); return err || reply(await W.peeringSet(data)); }
       return J({ error: "GET or PUT" }, 405);
     }
     if (p === "/api/peers") {
       if (method === "GET") return J(await W.peerList());
-      if (method === "POST") { const b = await readBody(); if (!b || typeof b.id !== "string") return J({ error: "id required" }, 400); return reply(await W.peerUpdate(b.id, b)); }
-      if (method === "DELETE") { const b = await readBody(); const id = (b && b.id) || url.searchParams.get("id"); if (typeof id !== "string") return J({ error: "id required" }, 400); return reply(await W.peerDelete(id)); }
+      if (method === "POST") { const { data: b, err } = await readBody(); if (err) return err; if (!b || typeof b.id !== "string") return J({ error: "id required" }, 400); return reply(await W.peerUpdate(b.id, b)); }
+      if (method === "DELETE") { const { data: b, err } = await readBody(); if (err) return err; const id = (b && b.id) || url.searchParams.get("id"); if (typeof id !== "string") return J({ error: "id required" }, 400); return reply(await W.peerDelete(id)); }
       return J({ error: "GET, POST or DELETE" }, 405);
     }
     if (method !== "POST") return J({ error: "POST required" }, 405);
-    if (p === "/api/peers/invite") return reply(await W.peerInvite(await readBody(), url.origin));
-    if (p === "/api/peers/accept") return reply(await W.peerAccept(await readBody(), url.origin));
-    if (p === "/api/peers/refresh") { const b = await readBody(); return reply(await W.peerRefresh(b && typeof b.id === "string" ? b.id : null)); }
+    if (p === "/api/peers/invite") { const { data, err } = await readBody(); return err || reply(await W.peerInvite(data, url.origin)); }
+    if (p === "/api/peers/accept") { const { data, err } = await readBody(); return err || reply(await W.peerAccept(data, url.origin)); }
+    if (p === "/api/peers/refresh") { const { data: b, err } = await readBody(); return err || reply(await W.peerRefresh(b && typeof b.id === "string" ? b.id : null)); }
     return J({ error: "not found" }, 404);
   }
   // Read tokens open exactly three GET routes. Anywhere else a token is ignored and the request falls through to the session check.
@@ -327,7 +377,7 @@ async function handle(request, env, ctx, rq) {
   const tvReadable = !!tokWorld || (tvOk && (p === "/api/live" || p === "/api/brief" || p === "/api/glance" || p === "/api/days" || p.startsWith("/api/img/")));
   if (!tvReadable) {
     if (!session) return J({ error: signInHint(env) }, 401);
-    if (!isOwner) return isApi ? J({ error: "forbidden" }, 403) : new Response("forbidden", { status: 403 });
+    if (!isOwner) return isApi ? J({ error: "forbidden" }, 403) : new Response("forbidden", { status: 403, headers: { "Cache-Control": "no-store" } });
   }
   // The credential that opened this request settles the world: a token or TV key its own; an owner session follows the marker.
   const cred = tokWorld ? { exact: tokWorld } : tvReadable && tvOk ? tvWorld : null;
@@ -341,36 +391,67 @@ async function handle(request, env, ctx, rq) {
     if (p === "/api/state") return J(await W.getState());
     if (p === "/api/log") return J(await W.getLog(url.searchParams.get("cursor"), Number(url.searchParams.get("limit")) || 100, Date.parse(url.searchParams.get("before") || "") || null));
     if (p === "/api/glance") {
-      const g = await W.getGlance(), h = { ETag: g.etag, "Cache-Control": "private, max-age=60" };
-      if ((request.headers.get("If-None-Match") || "").split(",").map(x => x.trim().replace(/^W\//, "")).includes(g.etag)) return new Response(null, { status: 304, headers: h });
+      const g = await W.getGlance(), h = { ETag: g.etag, "Cache-Control": "private, max-age=60, stale-while-revalidate=120" };
+      if (etagMatches(request.headers.get("If-None-Match"), g.etag)) return new Response(null, { status: 304, headers: h });
       return J(g.body, 200, h);
     }
     if (p === "/api/brief") return J(await W.getBrief(url.searchParams.get("kind") || "now"));
     if (p === "/api/tasks") return J(await W.getTasks());
     if (p === "/api/days") return J(await W.getDays(Number(url.searchParams.get("limit")) || 400));
-    if (p === "/api/rules") return J(await W.getRules(), 200, { "Cache-Control": "private, max-age=300" });
+    if (p === "/api/rules") {
+      if (!rulesCache) { const doc = await W.getRules(); rulesCache = { doc, etag: jsonEtag("r1", doc) }; }
+      const h = { ETag: rulesCache.etag, "Cache-Control": "private, max-age=300, stale-while-revalidate=3600" };
+      if (etagMatches(request.headers.get("If-None-Match"), rulesCache.etag)) return new Response(null, { status: 304, headers: h });
+      return J(rulesCache.doc, 200, h);
+    }
     if (p === "/api/signals") return J(await W.getDebug());
     if (p.startsWith("/api/img/")) {
-      const img = await W.getImage(decodeURIComponent(p.slice(9)));
-      if (!img) return new Response("not found", { status: 404 });
-      return new Response(img.bytes, { headers: { "Content-Type": img.type, "Cache-Control": "private, max-age=86400", ETag: '"' + img.at + '"' } });
+      const imgId = safeDecode(p.slice(9));
+      if (!imgId) return new Response("not found", { status: 404, headers: { "Cache-Control": "no-store" } });
+      const img = await W.getImage(imgId);
+      if (!img) return new Response("not found", { status: 404, headers: { "Cache-Control": "no-store" } });
+      const etag = '"' + img.at + '"', h = { "Cache-Control": "private, max-age=86400, stale-while-revalidate=604800", ETag: etag };
+      if (etagMatches(request.headers.get("If-None-Match"), etag)) return new Response(null, { status: 304, headers: h });
+      return new Response(img.bytes, { headers: { "Content-Type": img.type, ...h } });
     }
     return J({ error: "not found" }, 404);
   }
   // ---- the page. Opened with ?world=qc it is the QC world: tagged, and its API calls carry the marker.
-  if (asked === null) return new Response("unknown world", { status: 400 });
-  const page = stylePage(await env.ASSETS.fetch(request), env);
-  if (isQcWorld(asked)) { rq.world = asked; return qcPage(page, asked); }
-  return page;
+  if (asked === null) return new Response("unknown world", { status: 400, headers: { "Cache-Control": "no-store" } });
+  const rawAsset = await env.ASSETS.fetch(request);
+  const ct = rawAsset.headers.get("Content-Type") || "";
+  let page = stylePage(rawAsset, env);
+  if (isQcWorld(asked)) { rq.world = asked; page = qcPage(page, asked); }
+  const ah = new Headers(page.headers);
+  if (page.status === 200 || page.status === 206 || page.status === 304) {
+    ah.set("Cache-Control", cacheControlFor(p, ct, env.DEV === "1"));
+  } else {
+    ah.set("Cache-Control", "no-store");
+  }
+  const nullBody = page.status === 204 || page.status === 304;
+  return new Response(nullBody ? null : page.body, { status: page.status, statusText: page.statusText, headers: ah });
 }
 
 export default {
   async fetch(request, env, ctx) {
     const rq = { world: null };
-    const res = await handle(request, env, ctx, rq);
-    if (!isQcWorld(rq.world) || res.status === 101 || res.webSocket) return res;
-    const h = new Headers(res.headers); h.set("x-world", rq.world);       // every answer from a sandbox says so, and which one
-    return new Response(res.body, { status: res.status, statusText: res.statusText, headers: h });
+    const url = new URL(request.url), isApi = url.pathname.startsWith("/api/"), isHttps = url.protocol === "https:";
+    let res;
+    try {
+      res = await handle(request, env, ctx, rq);
+    } catch (e) {
+      console.log("fetch failed: " + String((e && e.message) || e).slice(0, 200));
+      res = isApi
+        ? J({ error: "internal error" }, 500)
+        : new Response("internal error", { status: 500, headers: { "Content-Type": "text/plain; charset=utf-8", "Cache-Control": "no-store" } });
+    }
+    if (res.status === 101 || res.webSocket) return res;
+    const h = new Headers(res.headers);
+    const isHtml = /text\/html/i.test(h.get("Content-Type") || "");
+    applySecurityHeaders(h, { isHtml, isApi, isHttps });
+    if (isQcWorld(rq.world)) h.set("x-world", rq.world);       // every answer from a sandbox says so, and which one
+    const nullBody = res.status === 204 || res.status === 304;
+    return new Response(nullBody ? null : res.body, { status: res.status, statusText: res.statusText, headers: h });
   },
 
   // Every 5 minutes, production only. The Durable Object also keeps its own alarm; whichever fires first runs

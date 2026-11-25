@@ -16,12 +16,18 @@ export const certsUrl = team => `https://${team}.cloudflareaccess.com/cdn-cgi/ac
 async function fetchKeys(team, fetchImpl) {
   const c = certsCache.get(team);
   if (c && Date.now() - c.at < CERTS_TTL_MS) return c.keys;
-  const r = await fetchImpl(certsUrl(team));
-  if (!r.ok) throw new Error("Access certs: HTTP " + r.status);
-  const doc = await r.json();
-  const keys = Array.isArray(doc.keys) ? doc.keys.filter(k => k.kty === "RSA" && k.kid) : [];
-  certsCache.set(team, { at: Date.now(), keys });
-  return keys;
+  try {
+    const init = fetchImpl === fetch && typeof AbortSignal !== "undefined" && AbortSignal.timeout ? { signal: AbortSignal.timeout(10_000) } : undefined;
+    const r = init ? await fetchImpl(certsUrl(team), init) : await fetchImpl(certsUrl(team));
+    if (!r.ok) throw new Error("Access certs: HTTP " + r.status);
+    const doc = await r.json();
+    const keys = Array.isArray(doc.keys) ? doc.keys.filter(k => k.kty === "RSA" && k.kid) : [];
+    certsCache.set(team, { at: Date.now(), keys });
+    return keys;
+  } catch (e) {
+    if (c && c.keys.length) return c.keys;
+    throw e;
+  }
 }
 
 /** The Access JWT a request carries: the header Access sets, or its cookie. */

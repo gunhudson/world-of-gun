@@ -91,9 +91,10 @@ class Stage {
     this.time = 0; this.last = 0; this.raf = 0; this.running = false; this.lost = false; this.disposed = false;
     this.cssW = 1; this.cssH = 1; this.showGlobe = false; this.offline = !!(opts && opts.offline);
     this.realm = null; this.pendingMode = null;
-    this.frameMs = []; this.fps = 0;
+    this.frameMs = new Float64Array(240); this._fmIdx = 0; this._fmLen = 0; this.fps = 0;
     this.sat = 1; this.skin = SKINS.operative;
-    this._ray = new THREE.Raycaster(); this._ndc = new THREE.Vector2(); this._sv = new THREE.Vector3();
+    this._ray = new THREE.Raycaster(); this._ndc = new THREE.Vector2(); this._sv = new THREE.Vector3(); this._fwd = new THREE.Vector3();
+    this._resizeRaf = 0; this._rect = null;
     this._frame = this._frame.bind(this);
   }
 
@@ -202,6 +203,11 @@ class Stage {
     const msaa = t.msaa > 2 && dpr >= 1.75 && !t.offline ? 2 : t.msaa || 0;
     if (this.post.samples !== msaa) this.post.setQuality({ ...t, msaa });
     this.post.setSize(bw * s, bh * s);
+    this._rect = null;
+  }
+  _scheduleResize() {
+    if (this.disposed || this._resizeRaf) return;
+    this._resizeRaf = requestAnimationFrame(() => { this._resizeRaf = 0; this.resize(); });
   }
 
   // Compile every program the active biome needs while the picture is still black (first shot, or under the
@@ -345,7 +351,7 @@ class Stage {
   off(type, fn) { this.ev.off(type, fn); }
 
   getInfo() {
-    const s = this.frameMs.slice().sort((a, b) => a - b);
+    const s = Array.from(this.frameMs.subarray(0, this._fmLen)).sort((a, b) => a - b);
     return { tier: this.tier?.name, scale: this.govScale, auto: this.auto, pixelRatio: this.pixelRatio, phone: this.phone, gl: this.glInfo, fps: this.fps, frameMs: s.length ? s[s.length >> 1] : null,
       p95: s.length ? s[Math.floor(s.length * 0.95)] : null, buffer: [this.bufW, this.bufH], render: [this.post?.w, this.post?.h],
       calls: this.renderer?.info.render.calls, triangles: this.renderer?.info.render.triangles, mode: this.mode, biome: this.biomeDef?.id };
@@ -367,7 +373,8 @@ class Stage {
     });
     add(c, "pointermove", (e) => {
       const p = pts.get(e.pointerId);
-      const rect = c.getBoundingClientRect();
+      if (e.pointerType !== "mouse" && !p) return;
+      const rect = this._rect || (this._rect = c.getBoundingClientRect());
       if (e.pointerType === "mouse") this.director.pointer.set(((e.clientX - rect.left) / rect.width) * 2 - 1, -(((e.clientY - rect.top) / rect.height) * 2 - 1));
       if (!p) return;
       const dx = e.clientX - p.x, dy = e.clientY - p.y; p.x = e.clientX; p.y = e.clientY;
@@ -404,8 +411,8 @@ class Stage {
       this.ev.emit("contextrestored", {});
       if (!document.hidden) this.start();
     });
-    if (typeof ResizeObserver !== "undefined") { this._ro = new ResizeObserver(() => this.resize()); this._ro.observe(c); }
-    add(window, "resize", () => this.resize());
+    if (typeof ResizeObserver !== "undefined") { this._ro = new ResizeObserver(() => this._scheduleResize()); this._ro.observe(c); }
+    add(window, "resize", () => this._scheduleResize());
     for (const ev of ["online", "focus", "pageshow"]) add(window, ev, () => this.chars.kick());      // the page is back: try the model again now
   }
   _zoom(f) { if (this.showGlobe) this.globe.zoom(f); else this.director.addZoom(f); }
@@ -435,7 +442,9 @@ class Stage {
     const raw = this.last ? (now - this.last) / 1000 : 1 / 60; this.last = now;
     const dt = Math.min(raw, 0.1);
     if (this.auto) { if (this.chars.inflight.size) this.governor.pause(1500); this.governor.tick(raw); }
-    this.frameMs.push(raw * 1000); if (this.frameMs.length > 240) this.frameMs.shift();
+    this.frameMs[this._fmIdx] = raw * 1000;
+    this._fmIdx = (this._fmIdx + 1) % this.frameMs.length;
+    if (this._fmLen < this.frameMs.length) this._fmLen++;
     this.fps = lerp(this.fps || 60, 1 / Math.max(raw, 1e-3), 0.05);
     try { this.render(dt); } catch (e) { if (!this._err) { this._err = true; console.error("[stage] frame", e); } }
   }
@@ -500,7 +509,7 @@ class Stage {
     P.focus = look.focus; P.aperture = look.aperture; P.range = look.range; P.sky = look.sky; P.blur = look.blur; P.dim = look.dim;
     // light shafts from the sun when it is in or near the frame: strongest low in the sky, gone under an overcast deck
     const sp = this._sv.copy(G.uSunDir.value).multiplyScalar(3000).add(this.camera.position).project(this.camera);
-    const ahead = G.uSunDir.value.dot(this._sv.set(0, 0, -1).applyQuaternion(this.camera.quaternion)) > 0.05;
+    const ahead = G.uSunDir.value.dot(this._fwd.set(0, 0, -1).applyQuaternion(this.camera.quaternion)) > 0.05;
     const inFrame = ahead ? smoothstep(1.7, 0.9, Math.max(Math.abs(sp.x), Math.abs(sp.y))) : 0;
     const alt = atmo.cur.alt;
     P.sunX = sp.x * 0.5 + 0.5; P.sunY = sp.y * 0.5 + 0.5;
@@ -513,6 +522,7 @@ class Stage {
 
   dispose() {
     if (this.disposed) return; this.disposed = true;
+    if (this._resizeRaf) { cancelAnimationFrame(this._resizeRaf); this._resizeRaf = 0; }
     this.stop();
     this.director?._resolveTween(false);
     for (const off of this._listeners || []) off();

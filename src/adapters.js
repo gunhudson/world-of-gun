@@ -34,6 +34,7 @@
 import { parseTs, iso, validZone } from "./lib/time.js";
 import { WMO } from "./lib/sun.js";
 
+const timeoutInit = (ms, init = {}) => (typeof AbortSignal !== "undefined" && AbortSignal.timeout ? { ...init, signal: AbortSignal.timeout(ms) } : init);
 const jget = async (r, what) => {
   const text = await r.text();
   let j; try { j = JSON.parse(text); } catch { throw new Error(what + ": HTTP " + r.status + ", not JSON"); }
@@ -50,16 +51,23 @@ async function weather(env, c) {
   const lat = Math.round(c.place.lat * 100) / 100, lon = Math.round(c.place.lon * 100) / 100;
   const prev = c.snapshot;
   if (prev && prev.lat === lat && prev.lon === lon && c.now - (parseTs(prev.fetchedAt) || 0) < 14 * 60000) return { skip: true, keep: true };
-  const w = await jget(await fetch("https://api.open-meteo.com/v1/forecast?latitude=" + lat + "&longitude=" + lon +
-    "&current=temperature_2m,relative_humidity_2m,apparent_temperature,weather_code,is_day,wind_speed_10m,precipitation&timezone=auto"), "open-meteo");
+  const [wRes, aRes] = await Promise.allSettled([
+    fetch("https://api.open-meteo.com/v1/forecast?latitude=" + lat + "&longitude=" + lon +
+      "&current=temperature_2m,relative_humidity_2m,apparent_temperature,weather_code,is_day,wind_speed_10m,precipitation&timezone=auto", timeoutInit(10_000))
+      .then(r => jget(r, "open-meteo")),
+    fetch("https://air-quality-api.open-meteo.com/v1/air-quality?latitude=" + lat + "&longitude=" + lon + "&current=us_aqi,pm2_5,pm10&timezone=auto", timeoutInit(10_000))
+      .then(r => jget(r, "open-meteo air")),
+  ]);
+  if (wRes.status !== "fulfilled") throw wRes.reason || new Error("open-meteo failed");
+  const w = wRes.value;
   if (!w.current) throw new Error("open-meteo: no current block");
   const cur = w.current, off = (w.utc_offset_seconds || 0) * 1000;
   const at = t => (t ? iso(Date.parse(t + ":00Z") - off) : null);
   let air = (prev && prev.lat === lat && prev.lon === lon && prev.air) || null;
-  try {
-    const a = await jget(await fetch("https://air-quality-api.open-meteo.com/v1/air-quality?latitude=" + lat + "&longitude=" + lon + "&current=us_aqi,pm2_5,pm10&timezone=auto"), "open-meteo air");
-    if (a.current) air = { usAqi: a.current.us_aqi ?? null, pm25: a.current.pm2_5 ?? null, pm10: a.current.pm10 ?? null, asOf: at(a.current.time) };
-  } catch { /* keep the last good air reading */ }
+  if (aRes.status === "fulfilled" && aRes.value && aRes.value.current) {
+    const a = aRes.value;
+    air = { usAqi: a.current.us_aqi ?? null, pm25: a.current.pm2_5 ?? null, pm10: a.current.pm10 ?? null, asOf: at(a.current.time) };
+  }
   return { snapshot: { lat, lon, tz: validZone(w.timezone) ? w.timezone : null, tempC: cur.temperature_2m, feelsC: cur.apparent_temperature, humidity: cur.relative_humidity_2m,
     code: cur.weather_code, label: WMO[cur.weather_code] || "Code " + cur.weather_code, windKph: cur.wind_speed_10m, precipMm: cur.precipitation ?? null, isDay: cur.is_day === 1,
     asOf: at(cur.time), fetchedAt: iso(c.now), air }, note: (WMO[cur.weather_code] || "") + " " + cur.temperature_2m + "°C" };
@@ -84,7 +92,7 @@ async function weather(env, c) {
 async function fleet(env, c) {
   if (!env.FLEET_STATUS_URL) return { skip: true, note: "not configured (set FLEET_STATUS_URL)" };
   const headers = env.FLEET_STATUS_KEY ? { Authorization: "Bearer " + env.FLEET_STATUS_KEY } : {};
-  const j = await jget(await fetch(env.FLEET_STATUS_URL, { headers }), "fleet status");
+  const j = await jget(await fetch(env.FLEET_STATUS_URL, timeoutInit(12_000, { headers })), "fleet status");
   if (!j.fleet || !Array.isArray(j.hosts)) throw new Error("fleet status: expected { fleet, hosts }");
   const events = [], prev = c.snapshot && c.snapshot.fleet ? c.snapshot.fleet.state : null;
   if (prev !== j.fleet.state) {

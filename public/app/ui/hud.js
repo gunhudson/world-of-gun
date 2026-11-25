@@ -439,7 +439,7 @@ export function createHud(app) {
     enter() {
       on = true; paint(store.state); el.classList.add("is-on");
       clearInterval(clock);
-      clock = setInterval(() => { const s = store.state; paintMap(s); paintBuffs(s); }, 20000);
+      clock = setInterval(() => { if (document.hidden) return; const s = store.state; paintMap(s); paintBuffs(s); }, 20000);
     },
     leave() { on = false; clearInterval(clock); el.classList.remove("is-on"); },
     update(s) { if (on) paint(s); },

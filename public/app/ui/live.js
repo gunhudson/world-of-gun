@@ -22,7 +22,7 @@ export function connectLive(h = {}) {
 }
 
 function open() {
-  if (stopped) return;
+  if (stopped || (typeof document !== "undefined" && document.hidden)) return;
   try {
     const url = (location.protocol === "https:" ? "wss://" : "ws://") + location.host + "/api/live";
     ws = new WebSocket(url);
@@ -48,9 +48,10 @@ function open() {
 function down() {
   startPolling();
   setLink(store.status === "ok" ? "polling" : "off");
+  clearTimeout(retryTimer);
+  if (typeof document !== "undefined" && document.hidden) return;
   const delay = BACKOFF[Math.min(attempt, BACKOFF.length - 1)] * (0.75 + Math.random() * 0.5);
   attempt++;
-  clearTimeout(retryTimer);
   retryTimer = setTimeout(open, delay);
 }
 

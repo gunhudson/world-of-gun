@@ -322,7 +322,7 @@ export class PostFX {
     f.uGrade.value.set(p.exposure, p.saturation, p.contrast, p.bloom);
     f.uLens.value.set(p.vignette, p.grain, p.bar, p.fade);
     f.uMood.value.set(p.dim, p.tintAmt, p.time, 0.006);
-    const size = r.getDrawingBufferSize(new THREE.Vector2());
+    const size = r.getDrawingBufferSize(this._sz);
     f.uRes.value.copy(size);
     this._pass(this.mFinal, null);
     if (this.captureNext) {

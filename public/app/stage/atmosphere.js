@@ -121,6 +121,9 @@ export class Atmosphere {
     this.cur = { ...this.target };
     this.snap = true;
     this.pA = blank(); this.pB = blank(); this.p = blank();
+    // scratch colours reused every frame (zero GC pressure in update())
+    this._g3 = new THREE.Color(); this._c1 = new THREE.Color(); this._c2 = new THREE.Color();
+    this._sunOvr = new THREE.Color(0.86, 0.94, 1); this._moonCol = col("#a8c6ff");
     this.exposure = 1; this.bio = 0; this.night = 0; this.lightI = 1; this.envI = 1;
     this.flashT = 4; this.particleScale = 1; this.wet = 0; this.overcast = 0; this.biomeSky = {}; this.present = 0; this.presentT = 0;
 
@@ -239,17 +242,17 @@ export class Atmosphere {
     const lum = (cc) => cc.r * 0.2126 + cc.g * 0.7152 + cc.b * 0.0722;
     const grey = (lum(p.zen) + lum(p.hor)) * 0.5;
     // overcast is slate and teal, never neutral grey; the last trace of sunset is taken out entirely
-    const g3 = new THREE.Color(grey * 0.74, grey * 0.95, grey * 1.16);
+    const g3 = this._g3.setRGB(grey * 0.74, grey * 0.95, grey * 1.16), c1 = this._c1, c2 = this._c2;
     const sk = this.biomeSky || {};
     this.overcast = o;
     const wetT = c.rain > 0.05 ? 1 : 0; this.wet = this._wetInit ? damp(this.wet, wetT, 0.7, dt) : wetT; this._wetInit = true;
     const heavy = Math.max(c.rain, c.storm);
-    p.zen.lerp(g3.clone().multiplyScalar(lerp(0.6, 0.38, heavy)), o * 0.97);
-    p.hor.lerp(g3.clone().multiplyScalar(1.1), o * 0.995);
-    p.sunHor.lerp(g3.clone().multiplyScalar(1.5).lerp(new THREE.Color(grey * 1.7, grey * 1.6, grey * 1.45), 0.35), o);   // a pale break in the deck where the sun is
+    p.zen.lerp(c1.copy(g3).multiplyScalar(lerp(0.6, 0.38, heavy)), o * 0.97);
+    p.hor.lerp(c1.copy(g3).multiplyScalar(1.1), o * 0.995);
+    p.sunHor.lerp(c1.copy(g3).multiplyScalar(1.5).lerp(c2.setRGB(grey * 1.7, grey * 1.6, grey * 1.45), 0.35), o);   // a pale break in the deck where the sun is
     p.glow.multiplyScalar(1 - 0.97 * o);
-    p.cloudLit.lerp(g3.clone().multiplyScalar(1.25), o * 0.99); p.cloudDark.lerp(g3.clone().multiplyScalar(lerp(0.34, 0.2, heavy)), o * 0.92);
-    p.sun.lerp(new THREE.Color(0.86, 0.94, 1), o * 0.97);
+    p.cloudLit.lerp(c1.copy(g3).multiplyScalar(1.25), o * 0.99); p.cloudDark.lerp(c1.copy(g3).multiplyScalar(lerp(0.34, 0.2, heavy)), o * 0.92);
+    p.sun.lerp(this._sunOvr, o * 0.97);
     p.sunI *= 1 - 0.74 * o;
     // presentation shots (title, select, sheet) take weather as mood, never as a wall: the weather's share of the
     // fog is cut to a third and the total is capped so the far silhouettes always read
@@ -266,7 +269,7 @@ export class Atmosphere {
     const mth = this.moonArt.az * DEG, malt = this.moonArt.alt * DEG;
     G.uMoonDir.value.set(Math.sin(mth) * Math.cos(malt), Math.sin(malt), -Math.cos(mth) * Math.cos(malt)).normalize();
 
-    const moonCol = col("#a8c6ff");
+    const moonCol = this._moonCol;
     const moonI = this.night * 0.85 * (1 - 0.7 * o);
     const useMoon = moonI > p.sunI;
     const L = G.uLightDir.value;
@@ -282,9 +285,13 @@ export class Atmosphere {
     G.uZenith.value.copy(p.zen); G.uHorizon.value.copy(p.hor); G.uSunHorizon.value.copy(p.sunHor);
     G.uSunGlow.value.copy(p.glow); G.uSunCol.value.copy(p.sun); G.uMoonCol.value.copy(moonCol);
     G.uCloudLit.value.copy(p.cloudLit); G.uCloudDark.value.copy(p.cloudDark);
-    G.uGround.value.copy(p.hor).multiplyScalar(0.22).lerp(new THREE.Color(0.05, 0.06, 0.04).multiplyScalar(lum(p.hor) * 2.2), 0.5);
-    G.uAmbient.value.copy(p.zen).multiplyScalar(0.55).add(p.hor.clone().multiplyScalar(0.45))
-      .add(G.uLightCol.value.clone().multiplyScalar(Math.max(L.y, 0) * 0.22));
+    const horLum = lum(p.hor) * 2.2;
+    G.uGround.value.copy(p.hor).multiplyScalar(0.22).lerp(c1.setRGB(0.05 * horLum, 0.06 * horLum, 0.04 * horLum), 0.5);
+    G.uAmbient.value.copy(p.zen).multiplyScalar(0.55).add(c1.copy(p.hor).multiplyScalar(0.45));
+    const lFac = Math.max(L.y, 0) * 0.22;
+    G.uAmbient.value.r += G.uLightCol.value.r * lFac;
+    G.uAmbient.value.g += G.uLightCol.value.g * lFac;
+    G.uAmbient.value.b += G.uLightCol.value.b * lFac;
     const discI = smoothstep(-1.5, 0.5, alt) * 28 * (1 - o);
     G.uSkyP.value.set(discI, this.night * (1 - 0.6 * o), this.night * (1 - 0.75 * o), p.sharp);
     G.uCloudP.value.x = lerp(c.cover * (sk.coverMul ?? 1), c.cover, o);
@@ -317,9 +324,11 @@ export class Atmosphere {
 
     // re-bake the environment when the palette has moved
     this.envAge += dt;
-    const sig = [p.zen.r, p.zen.g, p.zen.b, p.hor.r, p.hor.g, p.sunHor.r, p.sunHor.g, c.cover, G.uSunDir.value.x, G.uSunDir.value.y]
-      .map((v) => Math.round(v * 60)).join(",");
-    if (sig !== this.envSig && this.envAge > 0.35) this.bakeEnv(sig);
+    if (this.envAge > 0.35) {
+      const sd = G.uSunDir.value;
+      const sig = `${Math.round(p.zen.r * 60)},${Math.round(p.zen.g * 60)},${Math.round(p.zen.b * 60)},${Math.round(p.hor.r * 60)},${Math.round(p.hor.g * 60)},${Math.round(p.sunHor.r * 60)},${Math.round(p.sunHor.g * 60)},${Math.round(c.cover * 60)},${Math.round(sd.x * 60)},${Math.round(sd.y * 60)}`;
+      if (sig !== this.envSig) this.bakeEnv(sig);
+    }
   }
 
   bakeEnv(sig = this.envSig) {

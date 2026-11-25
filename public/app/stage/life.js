@@ -5,6 +5,8 @@ import * as THREE from "three";
 import { G, pick, fogify, softDot } from "./shared.js";
 import { clamp, lerp, smoothstep, rng, col } from "./util.js";
 
+const PLUME_TINT = new THREE.Color(0.42, 0.4, 0.44);
+
 // two wings and a tail; |x| is the wing reach, flapped around the body line
 function flapperGeometry() {
   const P = [0, 0, 0.14, -0.55, 0.02, -0.02, 0, 0, -0.2, 0, 0, 0.14, 0, 0, -0.2, 0.55, 0.02, -0.02, 0, 0, -0.16, -0.08, 0, -0.42, 0.08, 0, -0.42];
@@ -196,7 +198,7 @@ export class Life {
         const u = (t * 0.012 + o.ph) % 1;
         o.s.position.set(P.x + u * 520 + Math.sin(u * 9 + o.ph * 7) * 40, P.y + 40 + u * 330 + Math.sin(u * 6) * 20, P.z + u * 160);
         const sz = 90 + u * 420; o.s.scale.set(sz, sz * 0.75, 1);
-        o.s.material.color.copy(hz).multiplyScalar(0.8).lerp(lit, 0.25 * (1 - night)).lerp(new THREE.Color(0.42, 0.4, 0.44), 0.4);
+        o.s.material.color.copy(hz).multiplyScalar(0.8).lerp(lit, 0.25 * (1 - night)).lerp(PLUME_TINT, 0.4);
         o.s.material.opacity = smoothstep(0, 0.12, u) * (1 - smoothstep(0.55, 1, u)) * 0.4 * (1 - 0.5 * night) * (camera ? smoothstep(600, 1400, camera.position.distanceTo(o.s.position)) : 1);
       }
     }

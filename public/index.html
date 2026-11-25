@@ -19,8 +19,13 @@
 <script>
   // Set before first paint: the overlay route is transparent, and the saved skin applies at once.
   (function () {
-    var d = document.documentElement, q = location.search;
-    if (/[?&]overlay=1(&|$)/.test(q)) d.classList.add("overlay");
+    var d = document.documentElement, q = location.search, isOverlay = /[?&]overlay=1(&|$)/.test(q);
+    if (isOverlay) d.classList.add("overlay");
+    else if (!/[?&]stage=stub(&|$)/.test(q)) {
+      for (var u of ["/app/stage.js", "/vendor/three/build/three.module.min.js"]) {
+        var l = document.createElement("link"); l.rel = "modulepreload"; l.href = u; document.head.appendChild(l);
+      }
+    }
     try {
       var m = q.match(/[?&]skin=(operative|pandora|azeroth)/), s = m ? m[1] : localStorage.getItem("wog.skin");
       if (s === "pandora" || s === "azeroth") d.setAttribute("data-skin", s);
@@ -49,6 +54,7 @@
 <script type="importmap">{ "imports": {
   "three": "/vendor/three/build/three.module.min.js",
   "three/addons/": "/vendor/three/addons/" } }</script>
+<link rel="modulepreload" href="/app/main.js">
 <link rel="stylesheet" href="/app/css/tokens.css">
 <link rel="stylesheet" href="/app/css/chrome.css">
 <link rel="stylesheet" href="/app/css/screens.css">

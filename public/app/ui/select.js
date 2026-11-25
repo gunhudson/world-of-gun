@@ -139,7 +139,7 @@ export function createSelect(app) {
       return vw <= 700 ? { x: 0, y: 0, w: vw, h: Math.round(r.top) } : { x: 0, y: 0, w: Math.round(r.left), h: Math.round(plateTop) };
     },
     choose,
-    enter() { on = true; paint(); el.classList.add("is-on"); if (chosen) app.stage.setCharacter(chosen); clock = setInterval(paint, 20000); },
+    enter() { on = true; paint(); el.classList.add("is-on"); if (chosen) app.stage.setCharacter(chosen); clock = setInterval(() => { if (!document.hidden) paint(); }, 20000); },
     leave() { on = false; clearInterval(clock); el.classList.remove("is-on"); },
     update() { if (on) paint(); },
     key(k, e) {

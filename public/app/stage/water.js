@@ -245,10 +245,10 @@ export function createWater({ heightTex, rect, near = null }) {
     look = new THREE.Vector3(), cpos = new THREE.Vector3(), normal = new THREE.Vector3(0, 1, 0), origin = new THREE.Vector3(0, 0.17, 0);
   const clipPlanes = [new THREE.Plane(new THREE.Vector3(0, 1, 0), -0.12)];
   const bias = new THREE.Matrix4().set(0.5, 0, 0, 0.5, 0, 0.5, 0, 0.5, 0, 0, 0.5, 0.5, 0, 0, 0, 1);
-  const oldClear = new THREE.Color();
+  const oldClear = new THREE.Color(), _sz = new THREE.Vector2();
   function reflect(renderer, scene, camera, hide = []) {
     if (!reflectOn) return;
-    const size = renderer.getDrawingBufferSize(new THREE.Vector2());
+    const size = renderer.getDrawingBufferSize(_sz);
     const w = Math.max(64, Math.min(1024, Math.round(size.x / 2))), h = Math.max(64, Math.round(w * size.y / Math.max(size.x, 1)));
     if (!rt || rt.width !== w || rt.height !== h) { rt?.dispose(); rt = new THREE.WebGLRenderTarget(w, h, { type: THREE.HalfFloatType, depthBuffer: true, stencilBuffer: false }); uRefl.value = rt.texture; }
     cpos.setFromMatrixPosition(camera.matrixWorld);
